@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="
+		user-scalable=no, initial-scale=1,
+		maximum-scale=1, minimum-scale=1,
+		width=device-width, height=device-height,
+		target-densitydpi=device-dpi" />
+	<meta name="description" content="DiskGem: command-line secure file transfer client" />
+	<meta name="author" content="Nadim Kobeissi">
+	<title>DiskGem: command-line secure file transfer client</title>
+	<link rel="icon" type="image/png" href="img/diskgem.png" />
+	<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans|IBM+Plex+Serif|Righteous" rel="stylesheet">
+	<style type="text/css">
+		html {}
+
+		body {
+			font-family: 'IBM Plex Sans', sans-serif;
+			max-width: 80%;
+			width: 800px;
+			margin: 0 auto;
+			font-size: 14px;
+			line-height: 24px;
+			color: #333;
+		}
+
+		h2 {
+			text-align: center;
+			margin: 20px auto 10px auto;
+			font-size: 1.8em;
+			font-family: 'Righteous', sans-serif;
+			font-weight: normal;
+		}
+
+		p {
+			width: 80%;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		p.small {
+			font-size: 0.8em;
+			line-height: 1.2em;
+		}
+
+		span.pink {
+			color: #FFC0A9;
+		}
+
+		span.blue {
+			color: #54A4C7;
+		}
+
+		sup.r {
+			opacity: 0.5;
+			font-family: monospace;
+			font-size: 0.4em;
+		}
+
+		div.top {
+			width: 100%;
+			border-bottom: 1px solid #EEE;
+		}
+
+		div.top div.logoContents {
+			width: 50%;
+			margin: 0 auto;
+		}
+
+		div.top div.logoContents img.logo {
+			width: 100px;
+			height: auto;
+			display: inline;
+			margin: 0 0 0 30px;
+		}
+
+		div.top div.logoContents h1.logotype {
+			font-family: 'Righteous', sans-serif;
+			display: inline;
+			margin: 0 0 0 20px;
+			padding: 0;
+			bottom: 30px;
+			position: relative;
+			font-size: 3.5em;
+			font-weight: normal;
+		}
+
+		div.mid {
+			width: 100%;
+			border-bottom: 1px solid #EEE;
+		}
+
+		div.mid img.window {
+			max-width: 50%;
+			height: auto;
+			display: block;
+			margin: 0 auto;
+		}
+
+		div.bot {
+			width: 100%;
+		}
+
+		div.bot div.footer {
+			background: #EEE;
+			border-radius: 5px;
+			width: 80%;
+			padding: 1px;
+			text-align: center;
+			margin: 60px auto 10px auto;
+			font-size: 0.8em;
+		}
+
+		@media all and (max-width: 800px) {
+			body {
+				width: 100%;
+				max-width: 100%;
+			}
+
+			div.top div.logoContents {
+				width: 70%;
+			}
+
+			div.top div.logoContents img.logo {
+				width: 80px;
+				margin: 0 0 0 10px;
+			}
+
+			div.top div.logoContents h1.logotype {
+				font-size: 2.5em;
+				text-align: right;
+			}
+		}
+	</style>
+	<script type="application/javascript">
+		window.addEventListener('load', function () {
+			document.getElementById('footerYear').innerText = (new Date()).getFullYear();
+		});
+	</script>
+</head>
+
+<body>
+	<div class="top">
+		<div class="logoContents">
+			<img src="img/diskgem.svg" alt="" class="logo" />
+			<h1 class="logotype"><span class="pink">Disk</span><span class="blue">Gem</span><sup class="r">&reg;</sup></h1>
+		</div>
+	</div>
+	<div class="mid">
+		<h2>Solid, secure file transfer.</h2>
+		<img src="img/window.png" alt="" class="window" />
+		<p class="intro">
+			DiskGem<sup class="r">&reg;</sup> is software for secure file transfer over SFTP.
+			<br /><br />
+			DiskGem currently offers an easy to use, stable command-line user interface that supports parallel file transfers
+			and other useful features. DiskGem will soon also support creating encrypted archives on the server which offer
+			encryption of stored files as well as metadata obfuscation.
+		</p>
+	</div>
+	<div class="bot">
+		<h2>Get DiskGem</h2>
+		<p>
+			Version 1.1, released Nov. 9th 2018.
+			<br />
+			<a href="software/linux/amd64/diskgem">Linux (64-bit)</a>,
+			<a href="software/linux/arm/diskgem">Linux (ARM)</a>,
+			<a href="software/macos/diskgem">macOS (64-bit)</a>.
+		</p>
+		<p class="small">
+			<em>Note:</em> DiskGem currently is not available natively on Windows due to <code>cmd.exe</code> not supporting unicode, 256-color
+			or emojis. For the best experience on Windows, it is recommended to run DiskGem under WSL using <a href="https://github.com/mintty/wsltty">WSLtty</a>.
+		</p>
+		<div class="footer">
+			Copyright © <span id="footerYear"></span> Nadim Kobeissi, all rights reserved &mdash; <a href="https://github.com/kaepora/diskgem">source code</a>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+#!/usr/bin/fish
+
+echo -n "[DiskGem Build] Preparing..."
+cd src
+go get -d ./...
+echo -e "     [\e[32mOK\e[39m]"
+
+# Linux
+echo -n "[DiskGem Build] Linux AMD64..."
+set -x GOOS linux
+set -x GOARCH amd64
+go build -ldflags="-s -w"
+mv -f src ../dist/diskgem_linux_amd64
+echo -e "   [\e[32mOK\e[39m]"
+echo -n "[DiskGem Build] Linux ARM..."
+set -x GOARCH arm
+go build -ldflags="-s -w"
+mv -f src ../dist/diskgem_linux_arm
+echo -e "     [\e[32mOK\e[39m]"
+
+# Windows
+echo -n "[DiskGem Build] Windows AMD64..."
+set -x GOOS windows
+set -x GOARCH amd64
+go build -ldflags="-s -w"
+mv -f src.exe ../dist/diskgem_windows_amd64.exe
+echo -e " [\e[32mOK\e[39m]"
+
+# macOS
+echo -n "[DiskGem Build] macOS AMD64..."
+set -x GOOS darwin
+set -x GOARCH amd64
+go build -ldflags="-s -w"
+mv -f src ../dist/diskgem_darwin_amd64
+echo -e "   [\e[32mOK\e[39m]"
+
+# Unset variables
+echo -n "[DiskGem Build] Cleaning up..."
+set -e GOOS
+set -e GOARCH
+cd ..
+echo -e "   [\e[32mOK\e[39m]"
