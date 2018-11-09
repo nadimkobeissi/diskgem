@@ -224,14 +224,14 @@ func uiConnectSftpConnect(ui *gocui.Gui, v *gocui.View) error {
 		}
 	}
 	if len(lastFolder) > 0 {
-		_, err = sftpClient.ReadDir(lastFolder)
+		_, err = dgSFTPClient.ReadDir(lastFolder)
 		if err == nil {
 			dgState.mainWindow.state.rightPane.cwd = lastFolder
 		} else {
-			dgState.mainWindow.state.rightPane.cwd, err = sftpClient.Getwd()
+			dgState.mainWindow.state.rightPane.cwd, err = dgSFTPClient.Getwd()
 		}
 	} else {
-		dgState.mainWindow.state.rightPane.cwd, err = sftpClient.Getwd()
+		dgState.mainWindow.state.rightPane.cwd, err = dgSFTPClient.Getwd()
 	}
 	if err != nil {
 		uiMainStatusViewMessage(0, "Could not list remote starting folder. Disconnecting.")

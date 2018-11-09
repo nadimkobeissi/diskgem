@@ -229,7 +229,7 @@ func uiMainListArchiveFolder(ui *gocui.Gui) error {
 		})
 		return nil
 	}
-	archiveFiles, err := sftpClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
+	archiveFiles, err := dgSFTPClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
 	if err != nil {
 		ui.Update(func(g *gocui.Gui) error {
 			return uiMainStatusViewMessage(0, err.Error())
@@ -549,7 +549,7 @@ func uiMainNavigateLeft(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.mainWindow.state.leftPane.focused {
 		_, err = ioutil.ReadDir(cwd)
 	} else if dgState.mainWindow.state.rightPane.focused {
-		_, err = sftpClient.ReadDir(cwd)
+		_, err = dgSFTPClient.ReadDir(cwd)
 	}
 	if err != nil {
 		uiMainStatusViewMessage(0, strings.Join([]string{
@@ -576,7 +576,7 @@ func uiMainNavigateRight(ui *gocui.Gui, v *gocui.View) error {
 		if dgState.mainWindow.state.leftPane.focused {
 			_, err = ioutil.ReadDir(path.Join(paneState.cwd, selectedFile.Name()))
 		} else if dgState.mainWindow.state.rightPane.focused {
-			_, err = sftpClient.ReadDir(path.Join(paneState.cwd, selectedFile.Name()))
+			_, err = dgSFTPClient.ReadDir(path.Join(paneState.cwd, selectedFile.Name()))
 		}
 		if err != nil {
 			uiMainStatusViewMessage(0, strings.Join([]string{
@@ -591,7 +591,7 @@ func uiMainNavigateRight(ui *gocui.Gui, v *gocui.View) error {
 		if dgState.mainWindow.state.leftPane.focused {
 			link, err = os.Readlink(path.Join(paneState.cwd, selectedFile.Name()))
 		} else if dgState.mainWindow.state.rightPane.focused {
-			link, err = sftpClient.ReadLink(path.Join(paneState.cwd, selectedFile.Name()))
+			link, err = dgSFTPClient.ReadLink(path.Join(paneState.cwd, selectedFile.Name()))
 		}
 		if err != nil {
 			uiMainStatusViewMessage(0, "Could not read symbolic link.")
@@ -649,7 +649,7 @@ func uiMainGoToFolder(ui *gocui.Gui, v *gocui.View, goToFolderPath string) error
 		} else {
 			cwd = path.Join(dgState.mainWindow.state.rightPane.cwd, goToFolderPath)
 		}
-		_, err := sftpClient.ReadDir(cwd)
+		_, err := dgSFTPClient.ReadDir(cwd)
 		if err != nil {
 			uiMainStatusViewMessage(0, "Could not access folder.")
 			return err
@@ -680,7 +680,7 @@ func uiMainCreateFolder(ui *gocui.Gui, v *gocui.View, newFolderName string) erro
 			dgState.mainWindow.state.rightPane.cwd,
 			newFolderName,
 		)
-		err := sftpClient.Mkdir(newFolder)
+		err := dgSFTPClient.Mkdir(newFolder)
 		if err != nil {
 			uiMainStatusViewMessage(0, "Could not create folder.")
 			return err
@@ -702,7 +702,7 @@ func uiMainChmodFile(permissions string, fileName string) error {
 		err = os.Chmod(filePath, os.FileMode(permInt))
 	} else if dgState.mainWindow.state.rightPane.focused {
 		filePath = path.Join(dgState.mainWindow.state.rightPane.cwd, fileName)
-		err = sftpClient.Chmod(filePath, os.FileMode(permInt))
+		err = dgSFTPClient.Chmod(filePath, os.FileMode(permInt))
 	}
 	if err != nil {
 		uiMainStatusViewMessage(0, strings.Join([]string{
@@ -737,7 +737,7 @@ func uiMainRenameFile(ui *gocui.Gui, v *gocui.View, givenName string, fileName s
 		} else {
 			newPath = path.Join(dgState.mainWindow.state.rightPane.cwd, givenName)
 		}
-		err = sftpClient.Rename(oldPath, newPath)
+		err = dgSFTPClient.Rename(oldPath, newPath)
 		go uiMainListArchiveFolder(ui)
 	}
 	var messageFileName string
@@ -774,7 +774,7 @@ func uiMainDeleteSelected(ui *gocui.Gui, v *gocui.View) error {
 		len(dgState.mainWindow.state.rightPane.folderContents) > 0 {
 		selectedIndex = &dgState.mainWindow.state.rightPane.selectedIndex
 		selectedFile = dgState.mainWindow.state.rightPane.folderContents[*selectedIndex]
-		err = sftpClient.Remove(path.Join(
+		err = dgSFTPClient.Remove(path.Join(
 			dgState.mainWindow.state.rightPane.cwd, selectedFile.Name(),
 		))
 		go uiMainListArchiveFolder(ui)
@@ -807,7 +807,7 @@ func uiMainDisconnect(ui *gocui.Gui, v *gocui.View) error {
 			dgState.connectWindow.state.serverURI,
 			dgState.mainWindow.state.rightPane.cwd,
 		)
-		sftpDisconnect()
+		dgSFTPDisconnect()
 		err := dgConfigSave()
 		if err != nil {
 			uiMainStatusViewMessage(0, "Could not write to config file.")

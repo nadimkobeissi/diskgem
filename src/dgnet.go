@@ -29,9 +29,9 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-var sshClient *ssh.Client
-var sftpClient *sftp.Client
-var sftpConfirmationChannel = make(chan bool)
+var dgSSHClient *ssh.Client
+var dgSFTPClient *sftp.Client
+var dgSFTPConfirmationChannel = make(chan bool)
 
 func dgSFTPConnect(serverURI string, username string, password string) error {
 	var authMethod []ssh.AuthMethod
@@ -56,7 +56,7 @@ func dgSFTPConnect(serverURI string, username string, password string) error {
 	if err != nil {
 		return err
 	}
-	sftpClient, err = sftp.NewClient(sshClient)
+	dgSFTPClient, err = sftp.NewClient(sshClient)
 	return err
 }
 
@@ -94,7 +94,7 @@ func dgSFTPConfirmHostKeyVerification(onConfirm func()) error {
 	return nil
 }
 
-func sftpDisconnect() error {
-	sftpClient.Close()
+func dgSFTPDisconnect() error {
+	dgSFTPClient.Close()
 	return nil
 }

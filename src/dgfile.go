@@ -105,7 +105,7 @@ func dgFileUpload(
 		onFinish(err)
 		return nil
 	}
-	archiveFileWriter, err := sftpClient.Create(archiveFilePath)
+	archiveFileWriter, err := dgSFTPClient.Create(archiveFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
@@ -132,14 +132,14 @@ func dgFileDownload(
 	selectedFile os.FileInfo, selectedFilePath string, localFilePath string,
 	onStart func(), onProgress func(int), onFinish func(error),
 ) error {
-	selectedFileLstat, err := sftpClient.Lstat(selectedFilePath)
+	selectedFileLstat, err := dgSFTPClient.Lstat(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
 	}
 	selectedFileSize := selectedFileLstat.Size()
 	selectedFileChunk := int64(256000)
-	selectedFileReader, err := sftpClient.Open(selectedFilePath)
+	selectedFileReader, err := dgSFTPClient.Open(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
@@ -184,13 +184,13 @@ func dgFileFolderPathAutocomplete(input string, index int) (string, int) {
 		if dgState.mainWindow.state.leftPane.focused {
 			lastFolderContents, err = ioutil.ReadDir(lastFolder)
 		} else if dgState.mainWindow.state.rightPane.focused {
-			lastFolderContents, err = sftpClient.ReadDir(lastFolder)
+			lastFolderContents, err = dgSFTPClient.ReadDir(lastFolder)
 		}
 	} else {
 		if dgState.mainWindow.state.leftPane.focused {
 			lastFolderContents, err = ioutil.ReadDir(path.Join(dgState.mainWindow.state.leftPane.cwd, lastFolder))
 		} else if dgState.mainWindow.state.rightPane.focused {
-			lastFolderContents, err = sftpClient.ReadDir(path.Join(dgState.mainWindow.state.rightPane.cwd, lastFolder))
+			lastFolderContents, err = dgSFTPClient.ReadDir(path.Join(dgState.mainWindow.state.rightPane.cwd, lastFolder))
 		}
 	}
 	if err != nil {
