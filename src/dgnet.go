@@ -14,7 +14,6 @@ import (
 
 var dgSSHClient *ssh.Client
 var dgSFTPClient *sftp.Client
-var dgSFTPConfirmationChannel = make(chan bool)
 
 func dgSFTPConnect(serverURI string, username string, password string) error {
 	var authMethod []ssh.AuthMethod
