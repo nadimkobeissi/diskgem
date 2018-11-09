@@ -1,5 +1,5 @@
-![DiskGem](https://diskgem.info/img/diskgem.svg)
-![DiskGem Window](https://diskgem.info/img/window.png)
+![DiskGem](https://diskgem.info/img/diskgem.svg | width=128)
+![DiskGem Window](https://diskgem.info/img/window.png | width=400)
 
 ### What is DiskGem?
 DiskGem® is software for secure file transfer over SFTP. 
