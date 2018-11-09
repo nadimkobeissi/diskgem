@@ -54,13 +54,9 @@ func dgConfigLoad() error {
 			dgErrorCritical(errors.New("could not create config folder"))
 		}
 	}
-	_, err = os.Stat(configFilePath)
+	_, err = os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		configFile, err := os.Create(configFilePath)
-		if err != nil {
-			dgErrorCritical(errors.New("could not create config file"))
-		}
-		_ = configFile.Chmod(0600)
+		dgErrorCritical(errors.New("could not create or access config file"))
 	}
 	configFileContents, err := ioutil.ReadFile(configFilePath)
 	if err != nil {

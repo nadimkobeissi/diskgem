@@ -111,7 +111,6 @@ func dgFileUpload(
 		archiveFileWriter.Write(buffer)
 		onProgress(int(math.Ceil(float64(c * 100 / selectedFileSize))))
 	}
-	// archiveFileWriter.Chmod(0600)
 	onFinish(nil)
 	return nil
 }
@@ -132,7 +131,7 @@ func dgFileDownload(
 		onFinish(err)
 		return nil
 	}
-	localFileWriter, err := os.Create(localFilePath)
+	localFileWriter, err := os.OpenFile(localFilePath, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		onFinish(err)
 		return nil
@@ -150,7 +149,6 @@ func dgFileDownload(
 		localFileWriter.Write(buffer)
 		onProgress(int(math.Ceil(float64(c * 100 / selectedFileSize))))
 	}
-	localFileWriter.Chmod(0600)
 	onFinish(nil)
 	return nil
 }
