@@ -1,10 +1,10 @@
 <img src="https://diskgem.info/img/diskgem.svg" alt="DiskGem" width="128" />
 
-<img src="https://diskgem.info/img/window.png" alt="DiskGem Window" width="400" />
-
 ### What is DiskGem?
 DiskGem® is software for secure file transfer over SFTP. 
 DiskGem currently offers an easy to use, stable command-line user interface that supports parallel file transfers and other useful features. DiskGem will soon also support creating encrypted archives on the server which offer encryption of stored files as well as metadata obfuscation.
+
+<img src="https://diskgem.info/img/window.png" alt="DiskGem Window" width="400" />
 
 ### Questions and Answers
 
