@@ -75,7 +75,7 @@ func uiProperties(ui *gocui.Gui, v *gocui.View) error {
 	} else if dgState.mainWindow.state.rightPane.focused {
 		selectedIndex = &dgState.mainWindow.state.rightPane.selectedIndex
 		selectedFile = dgState.mainWindow.state.rightPane.folderContents[*selectedIndex]
-		selectedFileLstat, err = sftpClient.Lstat(path.Join(
+		selectedFileLstat, err = dgSFTPClient.Lstat(path.Join(
 			dgState.mainWindow.state.rightPane.cwd,
 			selectedFile.Name(),
 		))

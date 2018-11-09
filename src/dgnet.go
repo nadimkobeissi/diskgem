@@ -52,11 +52,11 @@ func dgSFTPConnect(serverURI string, username string, password string) error {
 		Auth:            authMethod,
 		HostKeyCallback: dgSFTPInitializeHostKeyVerification,
 	}
-	sshClient, err := ssh.Dial("tcp", serverURI, sshConfig)
+	dgSSHClient, err := ssh.Dial("tcp", serverURI, sshConfig)
 	if err != nil {
 		return err
 	}
-	dgSFTPClient, err = sftp.NewClient(sshClient)
+	dgSFTPClient, err = sftp.NewClient(dgSSHClient)
 	return err
 }
 
