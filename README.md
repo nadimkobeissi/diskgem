@@ -7,7 +7,7 @@ DiskGem currently offers an easy to use, stable command-line user interface that
 <img src="https://diskgem.info/img/window.png" alt="DiskGem Window" width="400" />
 
 ### Using DiskGem
-```
+```sh
 git clone https://github.com/kaepora/diskgem.git
 cd diskgem
 make
