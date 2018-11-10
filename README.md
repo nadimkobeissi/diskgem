@@ -6,6 +6,16 @@ DiskGem currently offers an easy to use, stable command-line user interface that
 
 <img src="https://diskgem.info/img/window.png" alt="DiskGem Window" width="400" />
 
+### Using DiskGem
+```
+git clone https://github.com/kaepora/diskgem.git
+cd diskgem
+make
+sudo make install
+```
+
+`diskgem` will launch DiskGem. `man diskgem` will show the manual page.
+
 ### Questions and Answers
 
 - **Question:** _Will DiskGem support Microsoft Windows?_
