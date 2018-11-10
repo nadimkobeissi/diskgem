@@ -17,9 +17,7 @@ darwinamd64: deps
 	GOOS="darwin" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_darwin_amd64 src/*
 
 deps:
-	@cd src
-	@go get -d ./...
-	@cd ..
+	@cd src; go get -d ./...; cd ..
 
 install:
 	install -m0755 dist/diskgem $(PREFIX)/bin/diskgem
