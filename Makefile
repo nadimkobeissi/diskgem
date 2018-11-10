@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: MIT
 #
 # Copyright (C) 2018 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
 
