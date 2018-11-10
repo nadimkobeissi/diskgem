@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT
- * Copyright © 2018 Nadim Kobeissi <nadim@symbolic.software>. All Rights Reserved.
+ * Copyright © 2018 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
  */
 
 package main
