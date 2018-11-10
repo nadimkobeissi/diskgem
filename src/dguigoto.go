@@ -74,7 +74,6 @@ func uiGoToAutocomplete(ui *gocui.Gui, v *gocui.View) error {
 		dgState.goToWindow.state.lastPath = path.Dir(goToPath)
 		dgState.goToWindow.state.lastInitial = path.Base(goToPath)[:1]
 	}
-
 	ui.Update(func(g *gocui.Gui) error {
 		newPath, newIndex := dgFileFolderPathAutocomplete(
 			path.Join(

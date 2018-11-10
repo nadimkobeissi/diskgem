@@ -95,7 +95,10 @@ func uiKeysCtrlP(ui *gocui.Gui, v *gocui.View) error {
 }
 
 func uiKeysCtrlR(ui *gocui.Gui, v *gocui.View) error {
-	go uiMainRefresh(ui, v)
+	ui.Update(func(g *gocui.Gui) error {
+		go uiMainRefresh(ui, v)
+		return nil
+	})
 	return nil
 }
 

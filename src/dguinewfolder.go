@@ -60,6 +60,9 @@ func uiNewFolderHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 	uiNewFolderToggle(ui, v)
-	go uiMainCreateFolder(ui, v, newFolderName)
+	ui.Update(func(g *gocui.Gui) error {
+		go uiMainCreateFolder(ui, v, newFolderName)
+		return nil
+	})
 	return nil
 }

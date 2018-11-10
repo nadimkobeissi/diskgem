@@ -67,7 +67,7 @@ func uiMainInit(ui *gocui.Gui) error {
 	ui.SetCurrentView("leftPane")
 	uiMainMenuViewUpdate()
 	uiMainMenuStatusViewUpdate()
-	uiMainListLocalFolder()
+	go uiMainListLocalFolder(ui)
 	uiKeysBind(ui)
 	coinFlip, _ := rand.Int(rand.Reader, big.NewInt(10))
 	if coinFlip.Int64() == int64(5) {
@@ -189,45 +189,45 @@ func uiMainTransfersViewUpdate() error {
 	return nil
 }
 
-func uiMainListLocalFolder() error {
-	files, err := ioutil.ReadDir(dgState.mainWindow.state.leftPane.cwd)
-	if err != nil {
-		uiMainStatusViewMessage(0, "Could not list local folder.")
-	}
-	dgState.mainWindow.state.leftPane.folderContents = dgFileInfoSort(files)
-	for i, file := range dgState.mainWindow.state.leftPane.folderContents {
-		if file.Name() == dgState.mainWindow.state.leftPane.lastFolder {
-			dgState.mainWindow.state.leftPane.selectedIndex = i
-			break
+func uiMainListLocalFolder(ui *gocui.Gui) error {
+	ui.Update(func(g *gocui.Gui) error {
+		files, err := ioutil.ReadDir(dgState.mainWindow.state.leftPane.cwd)
+		if err != nil {
+			uiMainStatusViewMessage(0, "Could not list local folder.")
 		}
-	}
-	uiMainRenderPane(false)
+		dgState.mainWindow.state.leftPane.folderContents = dgFileInfoSort(files)
+		for i, file := range dgState.mainWindow.state.leftPane.folderContents {
+			if file.Name() == dgState.mainWindow.state.leftPane.lastFolder {
+				dgState.mainWindow.state.leftPane.selectedIndex = i
+				break
+			}
+		}
+		uiMainRenderPane(false)
+		return nil
+	})
 	return nil
 }
 
 func uiMainListArchiveFolder(ui *gocui.Gui) error {
-	if !dgState.mainWindow.state.connected {
-		ui.Update(func(g *gocui.Gui) error {
-			return uiMainRenderPane(true)
-		})
-		return nil
-	}
-	archiveFiles, err := dgSFTPClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
-	if err != nil {
-		ui.Update(func(g *gocui.Gui) error {
-			return uiMainStatusViewMessage(0, err.Error())
-		})
-		return err
-	}
-	dgState.mainWindow.state.rightPane.folderContents = dgFileInfoSort(archiveFiles)
-	for i, file := range dgState.mainWindow.state.rightPane.folderContents {
-		if file.Name() == dgState.mainWindow.state.rightPane.lastFolder {
-			dgState.mainWindow.state.leftPane.selectedIndex = i
-			break
-		}
-	}
 	ui.Update(func(g *gocui.Gui) error {
-		return uiMainRenderPane(true)
+		if !dgState.mainWindow.state.connected {
+			uiMainRenderPane(true)
+			return nil
+		}
+		archiveFiles, err := dgSFTPClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
+		if err != nil {
+			uiMainStatusViewMessage(0, err.Error())
+			return err
+		}
+		dgState.mainWindow.state.rightPane.folderContents = dgFileInfoSort(archiveFiles)
+		for i, file := range dgState.mainWindow.state.rightPane.folderContents {
+			if file.Name() == dgState.mainWindow.state.rightPane.lastFolder {
+				dgState.mainWindow.state.leftPane.selectedIndex = i
+				break
+			}
+		}
+		uiMainRenderPane(true)
+		return nil
 	})
 	return nil
 }
@@ -327,7 +327,7 @@ func uiMainHandleChdir(ui *gocui.Gui, v *gocui.View, folder string) error {
 		}, ""))
 	}
 	if dgState.mainWindow.state.leftPane.focused {
-		uiMainListLocalFolder()
+		go uiMainListLocalFolder(ui)
 	} else if dgState.mainWindow.state.rightPane.focused {
 		go uiMainListArchiveFolder(ui)
 	}
@@ -456,10 +456,7 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 		if !uiMainTransfersTicker.active {
 			uiMainStartTransfersTicker(ui)
 		}
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainListLocalFolder()
-			return nil
-		})
+		go uiMainListLocalFolder(ui)
 	}, func(p int) {
 		thisTransfer.progress = p
 	}, func(err error) {
@@ -480,10 +477,10 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 
 func uiMainRefresh(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.mainWindow.state.leftPane.focused {
-		uiMainListLocalFolder()
+		go uiMainListLocalFolder(ui)
 		uiMainStatusViewMessage(1, "Refreshed local folder.")
 	} else if dgState.mainWindow.state.rightPane.focused {
-		uiMainListArchiveFolder(ui)
+		go uiMainListArchiveFolder(ui)
 		uiMainStatusViewMessage(1, "Refreshed archive folder.")
 	}
 	return nil
@@ -624,7 +621,7 @@ func uiMainGoToFolder(ui *gocui.Gui, v *gocui.View, goToFolderPath string) error
 			return err
 		}
 		dgState.mainWindow.state.leftPane.cwd = cwd
-		uiMainListLocalFolder()
+		go uiMainListLocalFolder(ui)
 	} else if dgState.mainWindow.state.rightPane.focused {
 		var cwd string
 		if path.IsAbs(goToFolderPath) {
@@ -657,7 +654,7 @@ func uiMainCreateFolder(ui *gocui.Gui, v *gocui.View, newFolderName string) erro
 		uiMainStatusViewMessage(2, strings.Join([]string{
 			"Created new folder ", newFolderName, ".",
 		}, ""))
-		uiMainListLocalFolder()
+		go uiMainListLocalFolder(ui)
 	} else if dgState.mainWindow.state.rightPane.focused {
 		newFolder := path.Join(
 			dgState.mainWindow.state.rightPane.cwd,
@@ -712,7 +709,7 @@ func uiMainRenameFile(ui *gocui.Gui, v *gocui.View, givenName string, fileName s
 			newPath = path.Join(dgState.mainWindow.state.leftPane.cwd, givenName)
 		}
 		err = os.Rename(oldPath, newPath)
-		uiMainListLocalFolder()
+		go uiMainListLocalFolder(ui)
 	} else if dgState.mainWindow.state.rightPane.focused {
 		oldPath = path.Join(dgState.mainWindow.state.rightPane.cwd, fileName)
 		if isWholePath {
@@ -752,7 +749,7 @@ func uiMainDeleteSelected(ui *gocui.Gui, v *gocui.View) error {
 		err = os.Remove(path.Join(
 			dgState.mainWindow.state.leftPane.cwd, selectedFile.Name(),
 		))
-		uiMainListLocalFolder()
+		go uiMainListLocalFolder(ui)
 	} else if dgState.mainWindow.state.rightPane.focused &&
 		len(dgState.mainWindow.state.rightPane.folderContents) > 0 {
 		selectedIndex = &dgState.mainWindow.state.rightPane.selectedIndex
@@ -797,7 +794,7 @@ func uiMainDisconnect(ui *gocui.Gui, v *gocui.View) error {
 		}
 	}
 	dgStateReset(true)
-	uiMainListLocalFolder()
+	go uiMainListLocalFolder(ui)
 	go uiMainListArchiveFolder(ui)
 	uiMainStatusViewMessage(1, "Disconnected.")
 	uiMainMenuViewUpdate()
