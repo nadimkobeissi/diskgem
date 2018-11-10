@@ -8,19 +8,13 @@ all: deps
 	go build -ldflags="-s -w" -o dist/diskgem src/*
 
 linuxamd64: deps
-	@export GOOS="linux"
-	@export GOARCH="amd64"
-	go build -ldflags="-s -w" -o dist/diskgem_linux_amd64 src/*
+	GOOS="linux" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_linux_amd64 src/*
 
 linuxarm: deps
-	@export GOOS="linux"
-	@export GOARCH="arm"
-	go build -ldflags="-s -w" -o dist/diskgem_linux_arm src/*
+	GOOS="linux" GOARCH="arm" go build -ldflags="-s -w" -o dist/diskgem_linux_arm src/*
 
 darwinamd64: deps
-	@export GOOS="darwin"
-	@export GOARCH="amd64"
-	go build -ldflags="-s -w" -o dist/diskgem_darwin_amd64 src/*
+	GOOS="darwin" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_darwin_amd64 src/*
 
 deps:
 	@cd src
@@ -35,4 +29,4 @@ install:
 clean:
 	rm -rf dist/diskgem*
 
-.PHONY: all clean man src
+.PHONY: all linuxamd64 linuxarm darwinamd64 deps install clean src man web
