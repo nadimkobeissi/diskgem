@@ -14,6 +14,12 @@ make
 sudo make install
 ```
 
+Or, for the truly hurried:
+
+```sh
+echo "Z2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9rYWVwb3JhL2Rpc2tnZW0uZ2l0JiZjZCBkaXNrZ2VtJiZtYWtlJiZzdWRvIG1ha2UgaW5zdGFsbAo="|base64 -d|sh
+```
+
 `diskgem` will launch DiskGem. `man diskgem` will show the manual page.
 
 ### Questions and Answers
