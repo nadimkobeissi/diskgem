@@ -17,7 +17,7 @@ sudo make install
 Or, for the truly hurried:
 
 ```sh
-echo "Z2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9rYWVwb3JhL2Rpc2tnZW0uZ2l0JiZjZCBkaXNrZ2VtJiZtYWtlJiZzdWRvIG1ha2UgaW5zdGFsbAo="|base64 -d|sh
+sh "git clone https://github.com/kaepora/diskgem.git;cd diskgem;make;sudo make install"
 ```
 
 `diskgem` will launch DiskGem. `man diskgem` will show the manual page.
