@@ -10,8 +10,8 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-var dgVersion = "1.1"
-var dgBuildNumber = 2
+var dgVersion = "1.2"
+var dgBuildNumber = 3
 
 type dgticker struct {
 	gears  *time.Ticker
