@@ -156,14 +156,14 @@ var dgStatePrototype = dgstate{
 			leftPane: panestate{
 				focused:        true,
 				selectedIndex:  0,
-				cwd:            ".",
+				cwd:            "",
 				folderContents: []os.FileInfo{},
 				lastFolder:     "",
 			},
 			rightPane: panestate{
 				focused:        false,
 				selectedIndex:  0,
-				cwd:            ".",
+				cwd:            "",
 				folderContents: []os.FileInfo{},
 				lastFolder:     "",
 			},
@@ -228,35 +228,42 @@ var dgStatePrototype = dgstate{
 }
 
 func dgStateReset(visible bool) error {
+	lastFolderLocal := dgState.mainWindow.state.leftPane.cwd
 	dgState.mainWindow.state = dgStatePrototype.mainWindow.state
 	dgState.connectWindow.state = dgStatePrototype.connectWindow.state
 	dgState.aboutWindow.state = dgStatePrototype.aboutWindow.state
-	wd, err := os.Getwd()
-	cwdSet := false
-	if len(os.Args) > 1 && len(os.Args[1]) > 0 {
+	wd, wdErr := os.Getwd()
+	if len(lastFolderLocal) > 0 {
+		// 1. This is a session reset, keep last folder.
+		dgState.mainWindow.state.leftPane.cwd = lastFolderLocal
+	} else if len(os.Args) > 1 && len(os.Args[1]) > 0 {
+		// 2. Check if a valid argument was provided.
 		startPath := os.Args[1]
 		if path.IsAbs(startPath) {
 			_, err := ioutil.ReadDir(path.Clean(startPath))
 			if err == nil {
 				dgState.mainWindow.state.leftPane.cwd = path.Clean(startPath)
-				cwdSet = true
 			}
-		} else if err == nil {
+		} else if wdErr == nil {
 			_, err := ioutil.ReadDir(path.Join(wd, startPath))
 			if err == nil {
 				dgState.mainWindow.state.leftPane.cwd = path.Join(wd, startPath)
-				cwdSet = true
 			}
 		}
 	}
-	if !cwdSet {
-		_, err = os.Getwd()
-		if err != nil {
+	if len(dgState.mainWindow.state.leftPane.cwd) == 0 {
+		if wdErr == nil {
+			// 3. Use current working directory.
+			dgState.mainWindow.state.leftPane.cwd = wd
+		} else {
+			// 4. Last shot: use user home directory.
 			currentUser, err := user.Current()
-			if err != nil {
-				dgErrorCritical(errors.New("could not read local folder"))
+			if err == nil {
+				dgState.mainWindow.state.leftPane.cwd = path.Join(currentUser.HomeDir)
+			} else {
+				// 5. Everything has failed.
+				dgErrorCritical(errors.New("could not set any working directory"))
 			}
-			dgState.mainWindow.state.leftPane.cwd = path.Join(currentUser.HomeDir)
 		}
 	}
 	dgState.mainWindow.state.visible = visible

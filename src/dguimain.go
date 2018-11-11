@@ -544,7 +544,8 @@ func uiMainNavigateLeft(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.mainWindow.state.rightPane.focused {
 		paneState = &dgState.mainWindow.state.rightPane
 	}
-	cwd := path.Join(paneState.cwd, "..")
+	uiMainStatusViewMessage(1, paneState.cwd)
+	cwd := path.Dir(paneState.cwd)
 	if len(cwd) == 0 {
 		return nil
 	}
