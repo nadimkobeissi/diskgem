@@ -71,17 +71,7 @@ func uiMainInit(ui *gocui.Gui) error {
 	uiKeysBind(ui)
 	coinFlip, _ := rand.Int(rand.Reader, big.NewInt(10))
 	if coinFlip.Int64() == int64(5) {
-		ui.Update(func(g *gocui.Gui) error {
-			go dgUpdateCheck(func() {
-				uiMainStatusViewMessage(0, "Could not check for DiskGem software updates.")
-			}, func() {
-				uiMainStatusViewMessage(
-					1,
-					"DiskGem software update is available! Download it from https://diskgem.info.",
-				)
-			})
-			return nil
-		})
+		go uiMainUpdateCheck(ui)
 	}
 	return nil
 }
@@ -96,6 +86,25 @@ func uiMainManagerLayout(ui *gocui.Gui) error {
 	dgState.mainWindow.transfersView, _ = ui.SetView("transfers", (66 * maxX / 100), maxY-9, maxX-1, maxY-1)
 	if !dgState.mainWindow.state.visible {
 		uiMainInit(ui)
+	}
+	return nil
+}
+
+func uiMainUpdateCheck(ui *gocui.Gui) error {
+	updateStatus := dgUpdateCheck()
+	if updateStatus == 0 {
+		ui.Update(func(g *gocui.Gui) error {
+			uiMainStatusViewMessage(0, "Could not check for DiskGem software updates.")
+			return nil
+		})
+	}
+	if updateStatus == 1 {
+		ui.Update(func(g *gocui.Gui) error {
+			uiMainStatusViewMessage(1,
+				"DiskGem software update is available! Download it from https://diskgem.info.",
+			)
+			return nil
+		})
 	}
 	return nil
 }
@@ -188,18 +197,22 @@ func uiMainTransfersViewUpdate(t time.Time) time.Time {
 }
 
 func uiMainListLocalFolder(ui *gocui.Gui) error {
-	ui.Update(func(g *gocui.Gui) error {
-		files, err := ioutil.ReadDir(dgState.mainWindow.state.leftPane.cwd)
-		if err != nil {
+	files, err := ioutil.ReadDir(dgState.mainWindow.state.leftPane.cwd)
+	if err != nil {
+		ui.Update(func(g *gocui.Gui) error {
 			uiMainStatusViewMessage(0, "Could not list local folder.")
+			return nil
+		})
+		return err
+	}
+	dgState.mainWindow.state.leftPane.folderContents = dgFileInfoSort(files)
+	for i, file := range dgState.mainWindow.state.leftPane.folderContents {
+		if file.Name() == dgState.mainWindow.state.leftPane.lastFolder {
+			dgState.mainWindow.state.leftPane.selectedIndex = i
+			break
 		}
-		dgState.mainWindow.state.leftPane.folderContents = dgFileInfoSort(files)
-		for i, file := range dgState.mainWindow.state.leftPane.folderContents {
-			if file.Name() == dgState.mainWindow.state.leftPane.lastFolder {
-				dgState.mainWindow.state.leftPane.selectedIndex = i
-				break
-			}
-		}
+	}
+	ui.Update(func(g *gocui.Gui) error {
 		uiMainRenderPane(false)
 		return nil
 	})
@@ -207,23 +220,29 @@ func uiMainListLocalFolder(ui *gocui.Gui) error {
 }
 
 func uiMainListArchiveFolder(ui *gocui.Gui) error {
-	ui.Update(func(g *gocui.Gui) error {
-		if !dgState.mainWindow.state.connected {
+	if !dgState.mainWindow.state.connected {
+		ui.Update(func(g *gocui.Gui) error {
 			uiMainRenderPane(true)
 			return nil
-		}
-		archiveFiles, err := dgSFTPClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
-		if err != nil {
+		})
+		return nil
+	}
+	archiveFiles, err := dgSFTPClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
+	if err != nil {
+		ui.Update(func(g *gocui.Gui) error {
 			uiMainStatusViewMessage(0, err.Error())
-			return err
+			return nil
+		})
+		return err
+	}
+	dgState.mainWindow.state.rightPane.folderContents = dgFileInfoSort(archiveFiles)
+	for i, file := range dgState.mainWindow.state.rightPane.folderContents {
+		if file.Name() == dgState.mainWindow.state.rightPane.lastFolder {
+			dgState.mainWindow.state.leftPane.selectedIndex = i
+			break
 		}
-		dgState.mainWindow.state.rightPane.folderContents = dgFileInfoSort(archiveFiles)
-		for i, file := range dgState.mainWindow.state.rightPane.folderContents {
-			if file.Name() == dgState.mainWindow.state.rightPane.lastFolder {
-				dgState.mainWindow.state.leftPane.selectedIndex = i
-				break
-			}
-		}
+	}
+	ui.Update(func(g *gocui.Gui) error {
 		uiMainRenderPane(true)
 		return nil
 	})

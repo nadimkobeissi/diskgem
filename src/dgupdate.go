@@ -18,28 +18,24 @@ type dgupdate struct {
 	Critical    bool
 }
 
-func dgUpdateCheck(onFail func(), onUpdate func()) error {
+func dgUpdateCheck() int {
 	var updateData dgupdate
 	var httpClient = &http.Client{Timeout: 10 * time.Second}
 	r, err := httpClient.Get("https://diskgem.info/update.json")
 	if err != nil {
-		onFail()
-		return err
+		return 0
 	}
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		onFail()
-		return err
+		return 0
 	}
 	err = json.Unmarshal(body, &updateData)
 	if err != nil {
-		onFail()
-		return err
+		return 0
 	}
 	if updateData.Latest > dgBuildNumber {
-		onUpdate()
-		return nil
+		return 1
 	}
-	return nil
+	return 2
 }
