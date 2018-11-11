@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 )
@@ -66,20 +67,24 @@ func uiGoToHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 }
 
 func uiGoToAutocomplete(ui *gocui.Gui, v *gocui.View) error {
+	var autoCompleteInput = "/"
 	goToPath, _ := dgState.goToWindow.view.Line(0)
 	if (path.Dir(goToPath) == dgState.goToWindow.state.lastPath) &&
 		(path.Base(goToPath)[:1] == dgState.goToWindow.state.lastInitial) {
 		dgState.goToWindow.state.index++
+		if !strings.HasSuffix(goToPath, "/") {
+			autoCompleteInput = path.Base(goToPath)[:1]
+		}
 	} else {
 		dgState.goToWindow.state.lastPath = path.Dir(goToPath)
 		dgState.goToWindow.state.lastInitial = path.Base(goToPath)[:1]
+		if !strings.HasSuffix(goToPath, "/") {
+			autoCompleteInput = path.Base(goToPath)
+		}
 	}
 	ui.Update(func(g *gocui.Gui) error {
 		newPath, newIndex := dgFileFolderPathAutocomplete(
-			path.Join(
-				dgState.goToWindow.state.lastPath,
-				dgState.goToWindow.state.lastInitial,
-			),
+			path.Join(path.Dir(goToPath), autoCompleteInput),
 			dgState.goToWindow.state.index,
 		)
 		dgState.goToWindow.state.index = newIndex

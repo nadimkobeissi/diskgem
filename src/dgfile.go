@@ -174,9 +174,13 @@ func dgFileFolderPathAutocomplete(input string, index int) (string, int) {
 		}
 	} else {
 		if dgState.mainWindow.state.leftPane.focused {
-			lastFolderContents, err = ioutil.ReadDir(path.Join(dgState.mainWindow.state.leftPane.cwd, lastFolder))
+			lastFolderContents, err = ioutil.ReadDir(
+				path.Join(dgState.mainWindow.state.leftPane.cwd, lastFolder),
+			)
 		} else if dgState.mainWindow.state.rightPane.focused {
-			lastFolderContents, err = dgSFTPClient.ReadDir(path.Join(dgState.mainWindow.state.rightPane.cwd, lastFolder))
+			lastFolderContents, err = dgSFTPClient.ReadDir(
+				path.Join(dgState.mainWindow.state.rightPane.cwd, lastFolder),
+			)
 		}
 	}
 	if err != nil {
