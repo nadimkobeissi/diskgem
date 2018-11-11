@@ -7,6 +7,9 @@ PREFIX ?= /usr
 all: deps
 	go build -ldflags="-s -w" -o dist/diskgem src/*
 
+freebsdamd64: deps
+	GOOS="freebsd" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_freebsd_amd64 src/*
+
 linuxamd64: deps
 	GOOS="linux" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_linux_amd64 src/*
 
@@ -27,4 +30,4 @@ install:
 clean:
 	rm -rf dist/diskgem*
 
-.PHONY: all linuxamd64 linuxarm darwinamd64 deps install clean src man web
+.PHONY: all freebsdamd64 linuxamd64 linuxarm darwinamd64 deps install clean src man web
