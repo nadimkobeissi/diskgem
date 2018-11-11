@@ -1,3 +1,9 @@
+## DiskGem 1.3
+November 12, 2018
+
+- Greatly improved file transfer performance.
+- File transfers now show an estimate for remaining time.
+
 ## DiskGem 1.2
 November 11, 2018
 
