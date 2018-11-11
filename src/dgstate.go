@@ -230,43 +230,40 @@ var dgStatePrototype = dgstate{
 func dgStateReset(visible bool) error {
 	lastFolderLocal := dgState.mainWindow.state.leftPane.cwd
 	dgState.mainWindow.state = dgStatePrototype.mainWindow.state
+	dgState.mainWindow.state.leftPane.cwd = dgStateInitLeftPaneCwd(lastFolderLocal)
 	dgState.connectWindow.state = dgStatePrototype.connectWindow.state
 	dgState.aboutWindow.state = dgStatePrototype.aboutWindow.state
+	dgState.mainWindow.state.visible = visible
+	dgConfigLoad()
+	return nil
+}
+
+func dgStateInitLeftPaneCwd(lastFolderLocal string) string {
 	wd, wdErr := os.Getwd()
 	if len(lastFolderLocal) > 0 {
-		// 1. This is a session reset, keep last folder.
-		dgState.mainWindow.state.leftPane.cwd = lastFolderLocal
-	} else if len(os.Args) > 1 && len(os.Args[1]) > 0 {
-		// 2. Check if a valid argument was provided.
+		return lastFolderLocal
+	}
+	if len(os.Args) > 1 && len(os.Args[1]) > 0 {
 		startPath := os.Args[1]
 		if path.IsAbs(startPath) {
 			_, err := ioutil.ReadDir(path.Clean(startPath))
 			if err == nil {
-				dgState.mainWindow.state.leftPane.cwd = path.Clean(startPath)
+				return path.Clean(startPath)
 			}
 		} else if wdErr == nil {
 			_, err := ioutil.ReadDir(path.Join(wd, startPath))
 			if err == nil {
-				dgState.mainWindow.state.leftPane.cwd = path.Join(wd, startPath)
+				return path.Join(wd, startPath)
 			}
 		}
 	}
-	if len(dgState.mainWindow.state.leftPane.cwd) == 0 {
-		if wdErr == nil {
-			// 3. Use current working directory.
-			dgState.mainWindow.state.leftPane.cwd = wd
-		} else {
-			// 4. Last shot: use user home directory.
-			currentUser, err := user.Current()
-			if err == nil {
-				dgState.mainWindow.state.leftPane.cwd = path.Join(currentUser.HomeDir)
-			} else {
-				// 5. Everything has failed.
-				dgErrorCritical(errors.New("could not set any working directory"))
-			}
-		}
+	if wdErr == nil {
+		return wd
 	}
-	dgState.mainWindow.state.visible = visible
-	dgConfigLoad()
-	return nil
+	currentUser, err := user.Current()
+	if err == nil {
+		return path.Join(currentUser.HomeDir)
+	}
+	dgErrorCritical(errors.New("could not set any working directory"))
+	return lastFolderLocal
 }
