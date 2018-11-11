@@ -5,15 +5,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"os"
 	"os/user"
 	"path"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
+
+	"github.com/machinebox/progress"
 )
 
 func dgFileFindSSHPrivateKeyFiles() [][]byte {
@@ -43,8 +47,6 @@ func dgFileFindSSHPrivateKeyFiles() [][]byte {
 	return privateKeyFiles
 }
 
-// dgFileInfoSort sorts a a slice of FileInfo objects such that
-// they are organized alphabetically and with folders preceding files.
 func dgFileInfoSort(files []os.FileInfo) []os.FileInfo {
 	sortedFolders := []os.FileInfo{}
 	sortedHiddenFolders := []os.FileInfo{}
@@ -76,19 +78,17 @@ func dgFileInfoSort(files []os.FileInfo) []os.FileInfo {
 	)
 }
 
-// dgFileUpload throws a file unto the unknowable ether.
 func dgFileUpload(
 	selectedFile os.FileInfo, selectedFilePath string, archiveFilePath string,
-	onStart func(), onProgress func(int), onFinish func(error),
+	onStart func(), onProgress func(int, string), onFinish func(error),
 ) error {
-	selectedFileLstat, err := os.Lstat(selectedFilePath)
+	_, err := os.Lstat(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
 	}
-	selectedFileSize := selectedFileLstat.Size()
-	selectedFileChunk := int64(256000)
-	selectedFileReader, err := os.Open(selectedFilePath)
+	selectedFileDescriptor, err := os.Open(selectedFilePath)
+	selectedFileReader := progress.NewReader(selectedFileDescriptor)
 	if err != nil {
 		onFinish(err)
 		return nil
@@ -98,57 +98,58 @@ func dgFileUpload(
 		onFinish(err)
 		return nil
 	}
-	onStart()
-	for c := int64(0); c <= selectedFileSize; c += selectedFileChunk {
-		selectedFileReader.Seek(int64(c), 0)
-		var buffer []byte
-		if c+selectedFileChunk > selectedFileSize {
-			buffer = make([]byte, selectedFileSize-c)
-		} else {
-			buffer = make([]byte, selectedFileChunk)
+	go func() {
+		ctx := context.Background()
+		progressChan := progress.NewTicker(
+			ctx, selectedFileReader, selectedFile.Size(), 500*time.Millisecond,
+		)
+		for p := range progressChan {
+			onProgress(
+				int(p.Percent()),
+				dgFileDurationFormat(p.Remaining()),
+			)
 		}
-		selectedFileReader.Read(buffer)
-		archiveFileWriter.Write(buffer)
-		onProgress(int(math.Ceil(float64(c * 100 / selectedFileSize))))
-	}
+	}()
+	onStart()
+	archiveFileWriter.ReadFrom(selectedFileReader)
 	onFinish(nil)
 	return nil
 }
 
 func dgFileDownload(
 	selectedFile os.FileInfo, selectedFilePath string, localFilePath string,
-	onStart func(), onProgress func(int), onFinish func(error),
+	onStart func(), onProgress func(int, string), onFinish func(error),
 ) error {
-	selectedFileLstat, err := dgSFTPClient.Lstat(selectedFilePath)
+	_, err := dgSFTPClient.Lstat(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
 	}
-	selectedFileSize := selectedFileLstat.Size()
-	selectedFileChunk := int64(256000)
 	selectedFileReader, err := dgSFTPClient.Open(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
 	}
-	localFileWriter, err := os.OpenFile(localFilePath, os.O_RDWR|os.O_CREATE, 0600)
+	localFileDescriptor, err := os.OpenFile(localFilePath, os.O_RDWR|os.O_CREATE, 0600)
+	localFileWriter := progress.NewWriter(localFileDescriptor)
 	if err != nil {
 		onFinish(err)
 		return nil
 	}
-	onStart()
-	for c := int64(0); c <= selectedFileSize; c += selectedFileChunk {
-		selectedFileReader.Seek(int64(c), 0)
-		var buffer []byte
-		if c+selectedFileChunk > selectedFileSize {
-			buffer = make([]byte, selectedFileSize-c)
-		} else {
-			buffer = make([]byte, selectedFileChunk)
+	go func() {
+		ctx := context.Background()
+		progressChan := progress.NewTicker(
+			ctx, localFileWriter, selectedFile.Size(), 500*time.Millisecond,
+		)
+		for p := range progressChan {
+			onProgress(
+				int(p.Percent()),
+				dgFileDurationFormat(p.Remaining()),
+			)
 		}
-		selectedFileReader.Read(buffer)
-		localFileWriter.Write(buffer)
-		onProgress(int(math.Ceil(float64(c * 100 / selectedFileSize))))
-	}
+	}()
+	onStart()
+	selectedFileReader.WriteTo(localFileWriter)
 	onFinish(nil)
 	return nil
 }
@@ -211,4 +212,10 @@ func dgFileSizeFormat(b int64) string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f%cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+func dgFileDurationFormat(d time.Duration) string {
+	return strings.Join([]string{
+		strconv.Itoa(int(d.Minutes())), "min",
+	}, "")
 }

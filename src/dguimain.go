@@ -23,7 +23,7 @@ import (
 var uiMainTransfersTicker dgticker
 
 func uiMainStartTransfersTicker(ui *gocui.Gui) error {
-	uiMainTransfersTicker.gears = time.NewTicker(100 * time.Millisecond)
+	uiMainTransfersTicker.gears = time.NewTicker(500 * time.Millisecond)
 	uiMainTransfersTicker.active = true
 	go func() {
 		for t := range uiMainTransfersTicker.gears.C {
@@ -186,7 +186,7 @@ func uiMainTransfersViewUpdate(t time.Time) time.Time {
 			t.direction, " ", tName, " (",
 			rgbterm.FgString(dgFileSizeFormat(t.size), 150, 150, 150),
 			") ", rgbterm.FgString(strings.Join([]string{
-				strconv.Itoa(t.progress), "%",
+				strconv.Itoa(t.progress), "% [", t.remaining, "]",
 			}, ""), 78, 152, 184),
 		}, ""))
 	}
@@ -287,7 +287,7 @@ func uiMainRenderPane(rightPane bool) error {
 			if file.IsDir() || dgFileIsSymlink(file) {
 				fileString = rgbterm.FgString(strings.Join([]string{
 					"📁", file.Name(),
-				}, "  "), 0, 100, 150)
+				}, "  "), 0, 100, 155)
 			} else {
 				fileString = rgbterm.FgString(strings.Join([]string{
 					"📄", file.Name(),
@@ -302,7 +302,7 @@ func uiMainRenderPane(rightPane bool) error {
 		}
 		if i == paneState.selectedIndex && paneState.focused {
 			fmt.Fprintln(paneView,
-				rgbterm.BgString(fileString, 255, 255, 255),
+				rgbterm.BgString(fileString, 100, 100, 125),
 			)
 		} else {
 			fmt.Fprintln(paneView, fileString)
@@ -412,6 +412,7 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 			size:      selectedFile.Size(),
 			direction: "→",
 			progress:  0,
+			remaining: "?",
 			fromPath:  selectedFilePath,
 			toPath:    archiveFilePath,
 			finished:  false,
@@ -423,8 +424,9 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 			uiMainStartTransfersTicker(ui)
 		}
 		go uiMainListArchiveFolder(ui)
-	}, func(p int) {
-		thisTransfer.progress = p
+	}, func(progress int, remaining string) {
+		thisTransfer.progress = progress
+		thisTransfer.remaining = remaining
 	}, func(err error) {
 		thisTransfer.finished = true
 		if err != nil {
@@ -434,6 +436,7 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 			return
 		}
 		thisTransfer.progress = 100
+		thisTransfer.remaining = "done"
 		uiMainStatusViewMessage(2, strings.Join([]string{
 			"Uploaded ", selectedFile.Name(), ".",
 		}, ""))
@@ -468,6 +471,7 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 			size:      selectedFile.Size(),
 			direction: "←",
 			progress:  0,
+			remaining: "?",
 			fromPath:  selectedFilePath,
 			toPath:    localFilePath,
 			finished:  false,
@@ -479,8 +483,9 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 			uiMainStartTransfersTicker(ui)
 		}
 		go uiMainListLocalFolder(ui)
-	}, func(p int) {
-		thisTransfer.progress = p
+	}, func(progress int, remaining string) {
+		thisTransfer.progress = progress
+		thisTransfer.remaining = remaining
 	}, func(err error) {
 		thisTransfer.finished = true
 		if err != nil {
@@ -490,6 +495,7 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 			return
 		}
 		thisTransfer.progress = 100
+		thisTransfer.remaining = "done"
 		uiMainStatusViewMessage(2, strings.Join([]string{
 			"Downloaded ", selectedFile.Name(), ".",
 		}, ""))

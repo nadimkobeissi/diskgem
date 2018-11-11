@@ -19,6 +19,7 @@ type dgtransfer struct {
 	size      int64
 	direction string
 	progress  int
+	remaining string
 	fromPath  string
 	toPath    string
 	finished  bool
