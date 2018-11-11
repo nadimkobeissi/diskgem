@@ -181,7 +181,6 @@ func uiConnectSftpConnect(ui *gocui.Gui, v *gocui.View) error {
 				dgState.connectWindow.state.fingerprint, "\n      ",
 				"Press Ctrl+C to accept key or Ctrl+D to disconnect.",
 			}, ""))
-
 		} else {
 			uiMainStatusViewMessage(0, strings.Join([]string{
 				"Cannot connect to ", dgState.connectWindow.state.serverURI, ".",

@@ -34,12 +34,16 @@ func dgSFTPConnect(serverURI string, username string, password string) error {
 		Auth:            authMethod,
 		HostKeyCallback: dgSFTPInitializeHostKeyVerification,
 	}
-	dgSSHClient, err := ssh.Dial("tcp", serverURI, sshConfig)
+	sshSFTPClient, err := ssh.Dial("tcp", serverURI, sshConfig)
 	if err != nil {
 		return err
 	}
-	dgSFTPClient, err = sftp.NewClient(dgSSHClient)
-	return err
+	dgSFTPClient, err = sftp.NewClient(sshSFTPClient)
+	if err != nil {
+		return err
+	}
+	dgSSHClient, _ = ssh.Dial("tcp", serverURI, sshConfig)
+	return nil
 }
 
 func dgSFTPInitializeHostKeyVerification(hostname string, remote net.Addr, key ssh.PublicKey) error {
@@ -78,5 +82,6 @@ func dgSFTPConfirmHostKeyVerification(onConfirm func()) error {
 
 func dgSFTPDisconnect() error {
 	dgSFTPClient.Close()
+	dgSSHClient.Close()
 	return nil
 }

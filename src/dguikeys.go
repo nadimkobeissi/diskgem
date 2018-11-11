@@ -36,6 +36,7 @@ func uiKeysBind(ui *gocui.Gui) error {
 	ui.SetKeybinding("", gocui.KeyCtrlG, gocui.ModNone, uiKeysCtrlG)
 	ui.SetKeybinding("", gocui.KeyCtrlP, gocui.ModNone, uiKeysCtrlP)
 	ui.SetKeybinding("", gocui.KeyCtrlR, gocui.ModNone, uiKeysCtrlR)
+	ui.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, uiKeysCtrlS)
 	ui.SetKeybinding("", gocui.KeyCtrlA, gocui.ModNone, uiKeysCtrlA)
 	ui.SetKeybinding("", gocui.KeyCtrlQ, gocui.ModNone, uiKeysCtrlQ)
 	ui.SetKeybinding("", gocui.KeyTab, gocui.ModNone, uiKeysTab)
@@ -65,13 +66,13 @@ func uiKeysCtrlD(ui *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func uiKeysCtrlN(ui *gocui.Gui, v *gocui.View) error {
-	uiNewFolderToggle(ui, v)
+func uiKeysCtrlG(ui *gocui.Gui, v *gocui.View) error {
+	uiGoToToggle(ui, v)
 	return nil
 }
 
-func uiKeysCtrlG(ui *gocui.Gui, v *gocui.View) error {
-	uiGoToToggle(ui, v)
+func uiKeysCtrlN(ui *gocui.Gui, v *gocui.View) error {
+	uiNewFolderToggle(ui, v)
 	return nil
 }
 
@@ -85,6 +86,11 @@ func uiKeysCtrlR(ui *gocui.Gui, v *gocui.View) error {
 		go uiMainRefresh(ui, v)
 		return nil
 	})
+	return nil
+}
+
+func uiKeysCtrlS(ui *gocui.Gui, v *gocui.View) error {
+	uiShellToggle(ui, v)
 	return nil
 }
 
@@ -102,15 +108,18 @@ func uiKeysTab(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.connectWindow.state.visible {
 		return uiConnectHandleTab(ui, v)
 	}
-	if dgState.newFolderWindow.state.visible {
-		return nil
-	}
 	if dgState.goToWindow.state.visible {
 		go uiGoToAutocomplete(ui, v)
 		return nil
 	}
+	if dgState.newFolderWindow.state.visible {
+		return nil
+	}
 	if dgState.propertiesWindow.state.visible {
 		uiPropertiesHandleTab(ui, v)
+		return nil
+	}
+	if dgState.shellWindow.state.visible {
 		return nil
 	}
 	if dgState.aboutWindow.state.visible {
@@ -140,16 +149,20 @@ func uiKeysEnter(ui *gocui.Gui, v *gocui.View) error {
 		}
 		return nil
 	}
-	if dgState.newFolderWindow.state.visible {
-		uiNewFolderHandleEnter(ui, v)
-		return nil
-	}
 	if dgState.goToWindow.state.visible {
 		uiGoToHandleEnter(ui, v)
 		return nil
 	}
+	if dgState.newFolderWindow.state.visible {
+		uiNewFolderHandleEnter(ui, v)
+		return nil
+	}
 	if dgState.propertiesWindow.state.visible {
 		uiPropertiesHandleEnter(ui, v)
+		return nil
+	}
+	if dgState.shellWindow.state.visible {
+		uiShellHandleEnter(ui, v)
 		return nil
 	}
 	if dgState.aboutWindow.state.visible {
@@ -175,13 +188,16 @@ func uiKeysDelete(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.connectWindow.state.visible {
 		return nil
 	}
-	if dgState.newFolderWindow.state.visible {
-		return nil
-	}
 	if dgState.goToWindow.state.visible {
 		return nil
 	}
+	if dgState.newFolderWindow.state.visible {
+		return nil
+	}
 	if dgState.propertiesWindow.state.visible {
+		return nil
+	}
+	if dgState.shellWindow.state.visible {
 		return nil
 	}
 	if dgState.aboutWindow.state.visible {
@@ -195,13 +211,16 @@ func uiKeysArrowUp(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.connectWindow.state.visible {
 		return nil
 	}
-	if dgState.newFolderWindow.state.visible {
-		return nil
-	}
 	if dgState.goToWindow.state.visible {
 		return nil
 	}
+	if dgState.newFolderWindow.state.visible {
+		return nil
+	}
 	if dgState.propertiesWindow.state.visible {
+		return nil
+	}
+	if dgState.shellWindow.state.visible {
 		return nil
 	}
 	if dgState.aboutWindow.state.visible {
@@ -215,13 +234,16 @@ func uiKeysArrowDown(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.connectWindow.state.visible {
 		return nil
 	}
-	if dgState.newFolderWindow.state.visible {
-		return nil
-	}
 	if dgState.goToWindow.state.visible {
 		return nil
 	}
+	if dgState.newFolderWindow.state.visible {
+		return nil
+	}
 	if dgState.propertiesWindow.state.visible {
+		return nil
+	}
+	if dgState.shellWindow.state.visible {
 		return nil
 	}
 	if dgState.aboutWindow.state.visible {
@@ -236,11 +258,11 @@ func uiKeysArrowLeft(ui *gocui.Gui, v *gocui.View) error {
 		ui.CurrentView().MoveCursor(-1, 0, true)
 		return nil
 	}
-	if dgState.newFolderWindow.state.visible {
+	if dgState.goToWindow.state.visible {
 		ui.CurrentView().MoveCursor(-1, 0, true)
 		return nil
 	}
-	if dgState.goToWindow.state.visible {
+	if dgState.newFolderWindow.state.visible {
 		ui.CurrentView().MoveCursor(-1, 0, true)
 		return nil
 	}
@@ -248,60 +270,55 @@ func uiKeysArrowLeft(ui *gocui.Gui, v *gocui.View) error {
 		ui.CurrentView().MoveCursor(-1, 0, true)
 		return nil
 	}
+	if dgState.shellWindow.state.visible {
+		ui.CurrentView().MoveCursor(-1, 0, true)
+		return nil
+	}
 	if dgState.aboutWindow.state.visible {
 		return nil
 	}
-	go func() {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainNavigateLeft(ui, v)
-			return nil
-		})
-	}()
+	go ui.Update(func(g *gocui.Gui) error {
+		uiMainNavigateLeft(ui, v)
+		return nil
+	})
 	return nil
 }
 
 func uiKeysArrowRight(ui *gocui.Gui, v *gocui.View) error {
-	if dgState.connectWindow.state.visible {
+	var moveCursorRight = func() {
 		x, _ := ui.CurrentView().Cursor()
 		line, _ := ui.CurrentView().Line(0)
 		if len(line) > x {
 			ui.CurrentView().MoveCursor(1, 0, true)
 		}
-		return nil
 	}
-	if dgState.newFolderWindow.state.visible {
-		x, _ := ui.CurrentView().Cursor()
-		line, _ := ui.CurrentView().Line(0)
-		if len(line) > x {
-			ui.CurrentView().MoveCursor(1, 0, true)
-		}
+	if dgState.connectWindow.state.visible {
+		moveCursorRight()
 		return nil
 	}
 	if dgState.goToWindow.state.visible {
-		x, _ := ui.CurrentView().Cursor()
-		line, _ := ui.CurrentView().Line(0)
-		if len(line) > x {
-			ui.CurrentView().MoveCursor(1, 0, true)
-		}
+		moveCursorRight()
+		return nil
+	}
+	if dgState.newFolderWindow.state.visible {
+		moveCursorRight()
 		return nil
 	}
 	if dgState.propertiesWindow.state.visible {
-		x, _ := ui.CurrentView().Cursor()
-		line, _ := ui.CurrentView().Line(0)
-		if len(line) > x {
-			ui.CurrentView().MoveCursor(1, 0, true)
-		}
+		moveCursorRight()
+		return nil
+	}
+	if dgState.shellWindow.state.visible {
+		moveCursorRight()
 		return nil
 	}
 	if dgState.aboutWindow.state.visible {
 		return nil
 	}
-	go func() {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainNavigateRight(ui, v)
-			return nil
-		})
-	}()
+	go ui.Update(func(g *gocui.Gui) error {
+		uiMainNavigateRight(ui, v)
+		return nil
+	})
 	return nil
 }
 

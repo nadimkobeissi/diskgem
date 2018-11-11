@@ -57,12 +57,10 @@ func uiGoToHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 	uiGoToToggle(ui, v)
-	go func() {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainGoToFolder(ui, v, goToFolderPath)
-			return nil
-		})
-	}()
+	go ui.Update(func(g *gocui.Gui) error {
+		uiMainGoToFolder(ui, v, goToFolderPath)
+		return nil
+	})
 	return nil
 }
 

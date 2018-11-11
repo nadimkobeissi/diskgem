@@ -23,12 +23,12 @@ import (
 var uiMainTransfersTicker dgticker
 
 func uiMainStartTransfersTicker(ui *gocui.Gui) error {
-	uiMainTransfersTicker.gears = time.NewTicker(500 * time.Millisecond)
+	uiMainTransfersTicker.gears = time.NewTicker(100 * time.Millisecond)
 	uiMainTransfersTicker.active = true
 	go func() {
-		for range uiMainTransfersTicker.gears.C {
+		for t := range uiMainTransfersTicker.gears.C {
 			ui.Update(func(g *gocui.Gui) error {
-				uiMainTransfersViewUpdate()
+				uiMainTransfersViewUpdate(t)
 				return nil
 			})
 		}
@@ -107,28 +107,21 @@ func uiMainMenuViewUpdate() error {
 	}, ""))
 	if dgState.mainWindow.state.connected {
 		fmt.Fprint(dgState.mainWindow.menuView, strings.Join([]string{
-			rgbterm.FgString("D", 225, 100, 100),
-			"isconnect   ",
+			rgbterm.FgString("D", 225, 100, 100), "isconnect   ",
 		}, ""))
 	} else {
 		fmt.Fprint(dgState.mainWindow.menuView, strings.Join([]string{
-			rgbterm.FgString("C", 68, 132, 161),
-			"onnect   ",
+			rgbterm.FgString("C", 68, 132, 161), "onnect   ",
 		}, ""))
 	}
 	fmt.Fprint(dgState.mainWindow.menuView, strings.Join([]string{
-		rgbterm.FgString("N", 68, 132, 161),
-		"ew Folder   ",
-		rgbterm.FgString("G", 68, 132, 161),
-		"o To   ",
-		rgbterm.FgString("P", 68, 132, 161),
-		"roperties   ",
-		rgbterm.FgString("R", 68, 132, 161),
-		"efresh   ",
-		rgbterm.FgString("A", 68, 132, 161),
-		"bout   ",
-		rgbterm.FgString("Q", 225, 100, 100),
-		"uit",
+		rgbterm.FgString("G", 68, 132, 161), "o To   ",
+		rgbterm.FgString("N", 68, 132, 161), "ew Folder   ",
+		rgbterm.FgString("P", 68, 132, 161), "roperties   ",
+		rgbterm.FgString("R", 68, 132, 161), "efresh   ",
+		rgbterm.FgString("S", 68, 132, 161), "hell   ",
+		rgbterm.FgString("A", 68, 132, 161), "bout   ",
+		rgbterm.FgString("Q", 225, 100, 100), "uit",
 	}, ""))
 	return nil
 }
@@ -136,27 +129,32 @@ func uiMainMenuViewUpdate() error {
 func uiMainMenuStatusViewUpdate() error {
 	dgState.mainWindow.menuStatusView.Clear()
 	if dgState.mainWindow.state.connected {
-		fmt.Fprint(dgState.mainWindow.menuStatusView, rgbterm.BgString(" Online", 74, 197, 160))
+		fmt.Fprint(
+			dgState.mainWindow.menuStatusView,
+			rgbterm.BgString(" Online", 74, 197, 160),
+		)
 	} else {
-		fmt.Fprint(dgState.mainWindow.menuStatusView, rgbterm.BgString("Offline", 225, 100, 100))
+		fmt.Fprint(
+			dgState.mainWindow.menuStatusView,
+			rgbterm.BgString("Offline", 225, 100, 100),
+		)
 	}
 	return nil
 }
 
 func uiMainStatusViewMessage(kind int, message string) error {
-	preface := rgbterm.FgString("Error", 225, 100, 100)
-	if kind == 1 {
-		preface = rgbterm.FgString("Note", 78, 152, 184)
-	} else if kind == 2 {
-		preface = rgbterm.FgString("Success", 74, 197, 160)
+	prefaces := []string{
+		rgbterm.FgString("Error", 225, 100, 100),
+		rgbterm.FgString("Note", 78, 152, 184),
+		rgbterm.FgString("Success", 74, 197, 160),
 	}
 	fmt.Fprintln(dgState.mainWindow.statusView, strings.Join([]string{
-		preface, message,
+		prefaces[kind], message,
 	}, ": "))
 	return nil
 }
 
-func uiMainTransfersViewUpdate() error {
+func uiMainTransfersViewUpdate(t time.Time) time.Time {
 	for i := len(dgState.mainWindow.state.transfers) - 1; i >= 0; i-- {
 		if dgState.mainWindow.state.transfers[i].finished {
 			dgState.mainWindow.state.transfers = append(
@@ -186,7 +184,7 @@ func uiMainTransfersViewUpdate() error {
 	if len(dgState.mainWindow.state.transfers) == 0 {
 		uiMainStopTransfersTicker()
 	}
-	return nil
+	return t
 }
 
 func uiMainListLocalFolder(ui *gocui.Gui) error {
@@ -340,19 +338,24 @@ func uiMainHideAllWindowsExcept(except string, ui *gocui.Gui, v *gocui.View) err
 			uiConnectToggle(ui, v)
 		}
 	}
-	if dgState.newFolderWindow.state.visible {
-		if except != "newFolder" {
-			uiNewFolderToggle(ui, v)
-		}
-	}
 	if dgState.goToWindow.state.visible {
 		if except != "goTo" {
 			uiGoToToggle(ui, v)
 		}
 	}
+	if dgState.newFolderWindow.state.visible {
+		if except != "newFolder" {
+			uiNewFolderToggle(ui, v)
+		}
+	}
 	if dgState.propertiesWindow.state.visible {
 		if except != "properties" {
 			uiPropertiesToggle(ui, v)
+		}
+	}
+	if dgState.shellWindow.state.visible {
+		if except != "shell" {
+			uiShellToggle(ui, v)
 		}
 	}
 	if dgState.aboutWindow.state.visible {

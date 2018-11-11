@@ -81,15 +81,6 @@ type aboutwindow struct {
 	state aboutstate
 }
 
-type newfolderstate struct {
-	visible bool
-}
-
-type newfolderwindow struct {
-	view  *gocui.View
-	state newfolderstate
-}
-
 type gotostate struct {
 	visible     bool
 	lastPath    string
@@ -100,6 +91,15 @@ type gotostate struct {
 type gotowindow struct {
 	view  *gocui.View
 	state gotostate
+}
+
+type newfolderstate struct {
+	visible bool
+}
+
+type newfolderwindow struct {
+	view  *gocui.View
+	state newfolderstate
 }
 
 type propertiesstate struct {
@@ -118,12 +118,22 @@ type propertieswindow struct {
 	state           propertiesstate
 }
 
+type shellstate struct {
+	visible bool
+}
+
+type shellwindow struct {
+	view  *gocui.View
+	state shellstate
+}
+
 type dgstate struct {
 	mainWindow       mainwindow
 	connectWindow    connectwindow
-	newFolderWindow  newfolderwindow
 	goToWindow       gotowindow
+	newFolderWindow  newfolderwindow
 	propertiesWindow propertieswindow
+	shellWindow      shellwindow
 	aboutWindow      aboutwindow
 }
 
@@ -175,12 +185,6 @@ var dgStatePrototype = dgstate{
 			selected:    "connectServerURI",
 		},
 	},
-	newFolderWindow: newfolderwindow{
-		view: nil,
-		state: newfolderstate{
-			visible: false,
-		},
-	},
 	goToWindow: gotowindow{
 		view: nil,
 		state: gotostate{
@@ -188,6 +192,12 @@ var dgStatePrototype = dgstate{
 			lastPath:    "",
 			lastInitial: "",
 			index:       0,
+		},
+	},
+	newFolderWindow: newfolderwindow{
+		view: nil,
+		state: newfolderstate{
+			visible: false,
 		},
 	},
 	propertiesWindow: propertieswindow{
@@ -201,6 +211,12 @@ var dgStatePrototype = dgstate{
 			fileName:    "",
 			permissions: "",
 			selected:    "propertiesName",
+		},
+	},
+	shellWindow: shellwindow{
+		view: nil,
+		state: shellstate{
+			visible: false,
 		},
 	},
 	aboutWindow: aboutwindow{
