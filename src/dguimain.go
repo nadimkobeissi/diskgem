@@ -588,17 +588,18 @@ func uiMainNavigateRight(ui *gocui.Gui, v *gocui.View) error {
 }
 
 func uiMainJumpToRune(key rune) error {
-	if dgState.mainWindow.state.leftPane.focused {
-		for i, v := range dgState.mainWindow.state.leftPane.folderContents {
+	paneState := &dgState.mainWindow.state.leftPane
+	if dgState.mainWindow.state.rightPane.focused {
+		paneState = &dgState.mainWindow.state.rightPane
+	}
+	if (paneState.selectedIndex < len(paneState.folderContents)-1) &&
+		strings.HasPrefix(paneState.folderContents[paneState.selectedIndex].Name(), string(key)) &&
+		strings.HasPrefix(paneState.folderContents[paneState.selectedIndex+1].Name(), string(key)) {
+		paneState.selectedIndex++
+	} else {
+		for i, v := range paneState.folderContents {
 			if strings.HasPrefix(v.Name(), string(key)) {
-				dgState.mainWindow.state.leftPane.selectedIndex = i
-				break
-			}
-		}
-	} else if dgState.mainWindow.state.rightPane.focused {
-		for i, v := range dgState.mainWindow.state.rightPane.folderContents {
-			if strings.HasPrefix(v.Name(), string(key)) {
-				dgState.mainWindow.state.rightPane.selectedIndex = i
+				paneState.selectedIndex = i
 				break
 			}
 		}
