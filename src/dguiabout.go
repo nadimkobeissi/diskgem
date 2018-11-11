@@ -44,6 +44,7 @@ func uiAbout(ui *gocui.Gui, v *gocui.View) error {
 		dgState.mainWindow.state.version,
 		"\n  https://diskgem.info",
 	}, ""))
+	ui.SetCurrentView("about")
 	return nil
 }
 

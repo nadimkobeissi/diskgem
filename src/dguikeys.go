@@ -51,20 +51,6 @@ func uiKeysBind(ui *gocui.Gui) error {
 }
 
 func uiKeysRegularFilter(key rune) error {
-	if dgState.connectWindow.state.visible {
-
-	}
-	if dgState.newFolderWindow.state.visible {
-		return nil
-	}
-	if dgState.goToWindow.state.visible {
-	}
-	if dgState.propertiesWindow.state.visible {
-
-	}
-	if dgState.aboutWindow.state.visible {
-		return nil
-	}
 	uiMainJumpToRune(key)
 	return nil
 }
