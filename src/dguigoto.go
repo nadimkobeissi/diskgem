@@ -49,11 +49,11 @@ func uiGoToToggle(ui *gocui.Gui, v *gocui.View) error {
 func uiGoToHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 	goToFolderPath, _ := dgState.goToWindow.view.Line(0)
 	if len(goToFolderPath) < 1 {
-		uiMainStatusViewMessage(0, "Please enter a folder name.")
+		uiMainStatusViewMessage(ui, 0, "Please enter a folder name.")
 		return nil
 	}
 	if len(goToFolderPath) > 256 {
-		uiMainStatusViewMessage(0, "Folder name is too long.")
+		uiMainStatusViewMessage(ui, 0, "Folder name is too long.")
 		return nil
 	}
 	uiGoToToggle(ui, v)

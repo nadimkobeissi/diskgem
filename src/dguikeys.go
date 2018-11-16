@@ -169,7 +169,7 @@ func uiKeysEnter(ui *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 	if !dgState.mainWindow.state.connected {
-		uiMainStatusViewMessage(0, "Connection is not established.")
+		uiMainStatusViewMessage(ui, 0, "Connection is not established.")
 		return nil
 	}
 	if dgState.mainWindow.state.leftPane.focused &&

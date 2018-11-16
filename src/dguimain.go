@@ -93,18 +93,12 @@ func uiMainManagerLayout(ui *gocui.Gui) error {
 func uiMainUpdateCheck(ui *gocui.Gui) error {
 	updateStatus := dgUpdateCheck()
 	if updateStatus == 0 {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(0, "Could not check for DiskGem software updates.")
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 0, "Could not check for DiskGem software updates.")
 	}
 	if updateStatus == 1 {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(1,
-				"DiskGem software update is available! Download it from https://diskgem.info.",
-			)
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 1,
+			"DiskGem software update is available! Download it from https://diskgem.info.",
+		)
 	}
 	return nil
 }
@@ -151,15 +145,18 @@ func uiMainMenuStatusViewUpdate() error {
 	return nil
 }
 
-func uiMainStatusViewMessage(kind int, message string) error {
+func uiMainStatusViewMessage(ui *gocui.Gui, kind int, message string) error {
 	prefaces := []string{
 		rgbterm.FgString("Error", 225, 100, 100),
 		rgbterm.FgString("Note", 78, 152, 184),
 		rgbterm.FgString("Success", 74, 197, 160),
 	}
-	fmt.Fprintln(dgState.mainWindow.statusView, strings.Join([]string{
-		prefaces[kind], message,
-	}, ": "))
+	ui.Update(func(g *gocui.Gui) error {
+		fmt.Fprintln(dgState.mainWindow.statusView, strings.Join([]string{
+			prefaces[kind], message,
+		}, ": "))
+		return nil
+	})
 	return nil
 }
 
@@ -199,10 +196,7 @@ func uiMainTransfersViewUpdate(t time.Time) time.Time {
 func uiMainListLocalFolder(ui *gocui.Gui) error {
 	files, err := ioutil.ReadDir(dgState.mainWindow.state.leftPane.cwd)
 	if err != nil {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(0, "Could not list local folder.")
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 0, "Could not list local folder.")
 		return err
 	}
 	dgState.mainWindow.state.leftPane.folderContents = dgFileInfoSort(files)
@@ -229,10 +223,7 @@ func uiMainListArchiveFolder(ui *gocui.Gui) error {
 	}
 	archiveFiles, err := dgSFTPClient.ReadDir(dgState.mainWindow.state.rightPane.cwd)
 	if err != nil {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(0, err.Error())
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 0, err.Error())
 		return err
 	}
 	dgState.mainWindow.state.rightPane.folderContents = dgFileInfoSort(archiveFiles)
@@ -339,7 +330,7 @@ func uiMainRenderFocusedPane() error {
 
 func uiMainHandleChdir(ui *gocui.Gui, v *gocui.View, folder string) error {
 	if len(folder) > 0 {
-		uiMainStatusViewMessage(1, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 			"Entering ", folder, "...",
 		}, ""))
 	}
@@ -395,7 +386,7 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 	}
 	for _, v := range dgState.mainWindow.state.transfers {
 		if v.toPath == archiveFilePath && v.direction == "→" && !v.finished {
-			uiMainStatusViewMessage(1, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 				"Cannot upload ", selectedFile.Name(),
 				", the destination is already being written to.",
 			}, ""))
@@ -404,7 +395,7 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 	}
 	var thisTransfer dgtransfer
 	dgFileUpload(selectedFile, selectedFilePath, archiveFilePath, func() {
-		uiMainStatusViewMessage(1, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 			"Uploading ", selectedFile.Name(), "...",
 		}, ""))
 		thisTransfer = dgtransfer{
@@ -430,14 +421,14 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 	}, func(err error) {
 		thisTransfer.finished = true
 		if err != nil {
-			uiMainStatusViewMessage(0, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 				"Could not upload ", selectedFile.Name(), ".",
 			}, ""))
 			return
 		}
 		thisTransfer.progress = 100
 		thisTransfer.remaining = "done"
-		uiMainStatusViewMessage(2, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 			"Uploaded ", selectedFile.Name(), ".",
 		}, ""))
 	})
@@ -454,7 +445,7 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 	}
 	for _, v := range dgState.mainWindow.state.transfers {
 		if v.toPath == localFilePath && v.direction == "←" && !v.finished {
-			uiMainStatusViewMessage(1, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 				"Cannot download ", selectedFile.Name(),
 				", the destination is already being written to.",
 			}, ""))
@@ -463,7 +454,7 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 	}
 	var thisTransfer dgtransfer
 	dgFileDownload(selectedFile, selectedFilePath, localFilePath, func() {
-		uiMainStatusViewMessage(1, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 			"Downloading ", selectedFile.Name(), "...",
 		}, ""))
 		thisTransfer = dgtransfer{
@@ -489,14 +480,14 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 	}, func(err error) {
 		thisTransfer.finished = true
 		if err != nil {
-			uiMainStatusViewMessage(0, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 				"Could not download ", selectedFile.Name(), ".",
 			}, ""))
 			return
 		}
 		thisTransfer.progress = 100
 		thisTransfer.remaining = "done"
-		uiMainStatusViewMessage(2, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 			"Downloaded ", selectedFile.Name(), ".",
 		}, ""))
 	})
@@ -506,10 +497,10 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 func uiMainRefresh(ui *gocui.Gui, v *gocui.View) error {
 	if dgState.mainWindow.state.leftPane.focused {
 		go uiMainListLocalFolder(ui)
-		uiMainStatusViewMessage(1, "Refreshed local folder.")
+		uiMainStatusViewMessage(ui, 1, "Refreshed local folder.")
 	} else if dgState.mainWindow.state.rightPane.focused {
 		go uiMainListArchiveFolder(ui)
-		uiMainStatusViewMessage(1, "Refreshed archive folder.")
+		uiMainStatusViewMessage(ui, 1, "Refreshed archive folder.")
 	}
 	return nil
 }
@@ -560,7 +551,7 @@ func uiMainNavigateLeft(ui *gocui.Gui, v *gocui.View) error {
 		_, err = dgSFTPClient.ReadDir(cwd)
 	}
 	if err != nil {
-		uiMainStatusViewMessage(0, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 			"Cannot access ", cwd, ".",
 		}, ""))
 		return err
@@ -587,7 +578,7 @@ func uiMainNavigateRight(ui *gocui.Gui, v *gocui.View) error {
 			_, err = dgSFTPClient.ReadDir(path.Join(paneState.cwd, selectedFile.Name()))
 		}
 		if err != nil {
-			uiMainStatusViewMessage(0, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 				"Cannot access ", path.Join(paneState.cwd, selectedFile.Name()), ".",
 			}, ""))
 			return err
@@ -602,7 +593,7 @@ func uiMainNavigateRight(ui *gocui.Gui, v *gocui.View) error {
 			link, err = dgSFTPClient.ReadLink(path.Join(paneState.cwd, selectedFile.Name()))
 		}
 		if err != nil {
-			uiMainStatusViewMessage(0, "Could not read symbolic link.")
+			uiMainStatusViewMessage(ui, 0, "Could not read symbolic link.")
 			return nil
 		}
 		if path.IsAbs(link) {
@@ -646,7 +637,7 @@ func uiMainGoToFolder(ui *gocui.Gui, v *gocui.View, goToFolderPath string) error
 		}
 		_, err := ioutil.ReadDir(cwd)
 		if err != nil {
-			uiMainStatusViewMessage(0, "Could not access folder.")
+			uiMainStatusViewMessage(ui, 0, "Could not access folder.")
 			return err
 		}
 		dgState.mainWindow.state.leftPane.cwd = cwd
@@ -660,7 +651,7 @@ func uiMainGoToFolder(ui *gocui.Gui, v *gocui.View, goToFolderPath string) error
 		}
 		_, err := dgSFTPClient.ReadDir(cwd)
 		if err != nil {
-			uiMainStatusViewMessage(0, "Could not access folder.")
+			uiMainStatusViewMessage(ui, 0, "Could not access folder.")
 			return err
 		}
 		dgState.mainWindow.state.rightPane.cwd = cwd
@@ -677,10 +668,10 @@ func uiMainCreateFolder(ui *gocui.Gui, v *gocui.View, newFolderName string) erro
 		)
 		err := os.Mkdir(newFolder, 0700)
 		if err != nil {
-			uiMainStatusViewMessage(0, "Could not create folder.")
+			uiMainStatusViewMessage(ui, 0, "Could not create folder.")
 			return err
 		}
-		uiMainStatusViewMessage(2, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 			"Created new folder ", newFolderName, ".",
 		}, ""))
 		go uiMainListLocalFolder(ui)
@@ -691,10 +682,10 @@ func uiMainCreateFolder(ui *gocui.Gui, v *gocui.View, newFolderName string) erro
 		)
 		err := dgSFTPClient.Mkdir(newFolder)
 		if err != nil {
-			uiMainStatusViewMessage(0, "Could not create folder.")
+			uiMainStatusViewMessage(ui, 0, "Could not create folder.")
 			return err
 		}
-		uiMainStatusViewMessage(2, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 			"Created new folder ", newFolderName, ".",
 		}, ""))
 		go uiMainListArchiveFolder(ui)
@@ -702,7 +693,7 @@ func uiMainCreateFolder(ui *gocui.Gui, v *gocui.View, newFolderName string) erro
 	return nil
 }
 
-func uiMainChmodFile(permissions string, fileName string) error {
+func uiMainChmodFile(ui *gocui.Gui, permissions string, fileName string) error {
 	var err error
 	var filePath string
 	permInt, _ := strconv.ParseInt(permissions, 8, 64)
@@ -714,12 +705,12 @@ func uiMainChmodFile(permissions string, fileName string) error {
 		err = dgSFTPClient.Chmod(filePath, os.FileMode(permInt))
 	}
 	if err != nil {
-		uiMainStatusViewMessage(0, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 			"Could not modify permissions for ", fileName, ".",
 		}, ""))
 		return err
 	}
-	uiMainStatusViewMessage(2, strings.Join([]string{
+	uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 		"Modified permissions for ", fileName, ".",
 	}, ""))
 	return nil
@@ -756,12 +747,12 @@ func uiMainRenameFile(ui *gocui.Gui, v *gocui.View, givenName string, fileName s
 		messageFileName = path.Base(newPath)
 	}
 	if err != nil {
-		uiMainStatusViewMessage(0, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 			"Could not rename ", fileName, " to ", messageFileName, ".",
 		}, ""))
 		return err
 	}
-	uiMainStatusViewMessage(2, strings.Join([]string{
+	uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 		"Renamed ", fileName, " to ", messageFileName, ".",
 	}, ""))
 	return nil
@@ -790,18 +781,18 @@ func uiMainDeleteSelected(ui *gocui.Gui, v *gocui.View) error {
 	}
 	if err != nil {
 		if selectedFile.IsDir() {
-			uiMainStatusViewMessage(0, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 				"Could not delete ", selectedFile.Name(), ". ",
 				"Make sure the folder is empty and try again.",
 			}, ""))
 		} else {
-			uiMainStatusViewMessage(0, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 				"Could not delete ", selectedFile.Name(), ".",
 			}, ""))
 		}
 		return err
 	}
-	uiMainStatusViewMessage(2, strings.Join([]string{
+	uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 		"Deleted ", selectedFile.Name(), ".",
 	}, ""))
 	return nil
@@ -819,13 +810,13 @@ func uiMainDisconnect(ui *gocui.Gui, v *gocui.View) error {
 		dgSFTPDisconnect()
 		err := dgConfigSave()
 		if err != nil {
-			uiMainStatusViewMessage(0, "Could not write to config file.")
+			uiMainStatusViewMessage(ui, 0, "Could not write to config file.")
 		}
 	}
 	dgStateReset(true)
 	go uiMainListLocalFolder(ui)
 	go uiMainListArchiveFolder(ui)
-	uiMainStatusViewMessage(1, "Disconnected.")
+	uiMainStatusViewMessage(ui, 1, "Disconnected.")
 	uiMainMenuViewUpdate()
 	uiMainMenuStatusViewUpdate()
 	return nil

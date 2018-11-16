@@ -48,15 +48,15 @@ func uiNewFolderHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 		newFolderName,
 	)
 	if len(newFolderName) < 1 {
-		uiMainStatusViewMessage(0, "Please enter a folder name.")
+		uiMainStatusViewMessage(ui, 0, "Please enter a folder name.")
 		return nil
 	}
 	if len(newFolderName) > 128 {
-		uiMainStatusViewMessage(0, "Folder name is too long.")
+		uiMainStatusViewMessage(ui, 0, "Folder name is too long.")
 		return nil
 	}
 	if !validFolderName {
-		uiMainStatusViewMessage(0, "Invalid folder name.")
+		uiMainStatusViewMessage(ui, 0, "Invalid folder name.")
 		return nil
 	}
 	uiNewFolderToggle(ui, v)

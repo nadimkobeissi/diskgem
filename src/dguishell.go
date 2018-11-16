@@ -57,49 +57,34 @@ func uiShellCommandRun(ui *gocui.Gui, v *gocui.View, shellCommand string) error 
 		cmd := exec.Command(shellCommandArgs[0])
 		cmd.Args = shellCommandArgs
 		cmd.Dir = dgState.mainWindow.state.leftPane.cwd
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(1, strings.Join([]string{
-				"Dispatching shell command `", shellCommand, "` locally.",
-			}, ""))
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
+			"Dispatching shell command `", shellCommand, "` locally.",
+		}, ""))
 		cmd.Run()
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(1, strings.Join([]string{
-				"Shell command `", shellCommand,
-				"` has finished executing locally.\n",
-				"      DiskGem cannot guarantee that execution was successful.",
-			}, ""))
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
+			"Shell command `", shellCommand,
+			"` has finished executing locally.\n",
+			"      DiskGem cannot guarantee that execution was successful.",
+		}, ""))
 	} else if dgState.mainWindow.state.rightPane.focused {
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(1, strings.Join([]string{
-				"Dispatching shell command `", shellCommand, "` remotely.",
-			}, ""))
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
+			"Dispatching shell command `", shellCommand, "` remotely.",
+		}, ""))
 		sshSession, err := dgSSHClient.NewSession()
 		if err != nil {
-			ui.Update(func(g *gocui.Gui) error {
-				uiMainStatusViewMessage(0, "Could not run shell command on archive.")
-				return nil
-			})
-			return nil
+			uiMainStatusViewMessage(ui, 0, "Could not run shell command on archive.")
+			return err
 		}
 		sshSession.Run(strings.Join([]string{
 			"cd ", dgState.mainWindow.state.rightPane.cwd,
 			"; ", shellCommand,
 		}, ""))
 		sshSession.Close()
-		ui.Update(func(g *gocui.Gui) error {
-			uiMainStatusViewMessage(1, strings.Join([]string{
-				"Shell command `", shellCommand,
-				"` has finished executing remotely.\n",
-				"      DiskGem cannot guarantee that execution was successful.",
-			}, ""))
-			return nil
-		})
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
+			"Shell command `", shellCommand,
+			"` has finished executing remotely.\n",
+			"      DiskGem cannot guarantee that execution was successful.",
+		}, ""))
 	}
 	return nil
 }

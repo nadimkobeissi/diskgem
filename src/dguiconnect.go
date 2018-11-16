@@ -148,26 +148,31 @@ func uiConnectHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 	validServer, _ := regexp.MatchString(serverPattern, serverURI)
 	validUsername, _ := regexp.MatchString(usernamePattern, username)
 	if !validServer {
-		uiMainStatusViewMessage(0, "Invalid server.")
+		uiMainStatusViewMessage(ui, 0, "Invalid server.")
 		return nil
 	}
 	if !validUsername {
-		uiMainStatusViewMessage(0, "Invalid username.")
+		uiMainStatusViewMessage(ui, 0, "Invalid username.")
 		return nil
 	}
 	uiConnectToggle(ui, v)
 	serverHasPort, _ := regexp.MatchString(":\\d{1,5}$", serverURI)
 	if !serverHasPort {
 		serverURI = strings.Join([]string{serverURI, "22"}, ":")
-		uiMainStatusViewMessage(1, "No port specified, assuming 22.")
+		uiMainStatusViewMessage(ui, 1, "No port specified, assuming 22.")
 	}
 	dgState.connectWindow.state.serverURI = serverURI
 	dgState.connectWindow.state.username = username
 	dgState.connectWindow.state.password = password
-	return uiConnectSftpConnect(ui, v)
+	dgState.connectWindow.state.fingerprint = ""
+	go uiConnectSftpConnect(ui, v)
+	return nil
 }
 
 func uiConnectSftpConnect(ui *gocui.Gui, v *gocui.View) error {
+	uiMainStatusViewMessage(ui, 1, strings.Join([]string{
+		"Connecting to ", dgState.connectWindow.state.serverURI, "...",
+	}, ""))
 	err := dgSFTPConnect(
 		dgState.connectWindow.state.serverURI,
 		dgState.connectWindow.state.username,
@@ -175,28 +180,33 @@ func uiConnectSftpConnect(ui *gocui.Gui, v *gocui.View) error {
 	)
 	if err != nil {
 		if dgState.mainWindow.state.keyVerification {
-			uiMainStatusViewMessage(1, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 				dgState.connectWindow.state.serverURI,
 				" is offering a public key with fingerprint\n      ",
 				dgState.connectWindow.state.fingerprint, "\n      ",
 				"Press Ctrl+C to accept key or Ctrl+D to disconnect.",
 			}, ""))
 		} else {
-			uiMainStatusViewMessage(0, strings.Join([]string{
+			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 				"Cannot connect to ", dgState.connectWindow.state.serverURI, ".",
 			}, ""))
 		}
 		return err
+	} else {
+		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
+			"Server fingerprint accepted:", "\n      ",
+			dgState.connectWindow.state.fingerprint,
+		}, ""))
 	}
 	dgState.mainWindow.state.connected = true
 	err = dgConfigSave()
 	if err != nil {
-		uiMainStatusViewMessage(0, "Could not write to config file.")
+		uiMainStatusViewMessage(ui, 0, "Could not write to config file.")
 	}
-	uiMainStatusViewMessage(2, strings.Join([]string{
+	uiMainStatusViewMessage(ui, 2, strings.Join([]string{
 		"Connected to ", dgState.connectWindow.state.serverURI, ".",
 	}, ""))
-	uiMainStatusViewMessage(1, "Listing archive...")
+	uiMainStatusViewMessage(ui, 1, "Listing archive...")
 	var lastFolder string
 	for _, server := range dgState.mainWindow.state.knownServers {
 		if server.Hostname == dgState.connectWindow.state.serverURI {
@@ -216,7 +226,7 @@ func uiConnectSftpConnect(ui *gocui.Gui, v *gocui.View) error {
 		dgState.mainWindow.state.rightPane.cwd, err = dgSFTPClient.Getwd()
 	}
 	if err != nil {
-		uiMainStatusViewMessage(0, "Could not list remote starting folder. Disconnecting.")
+		uiMainStatusViewMessage(ui, 0, "Could not list remote starting folder. Disconnecting.")
 		uiMainDisconnect(ui, v)
 		return err
 	}

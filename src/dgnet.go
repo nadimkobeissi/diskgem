@@ -49,13 +49,13 @@ func dgSFTPConnect(serverURI string, username string, password string) error {
 func dgSFTPInitializeHostKeyVerification(hostname string, remote net.Addr, key ssh.PublicKey) error {
 	dgState.mainWindow.state.keyVerification = true
 	fp := ssh.FingerprintSHA256(key)
+	dgState.connectWindow.state.fingerprint = fp
 	for _, server := range dgState.mainWindow.state.knownServers {
 		if server.Hostname == hostname && server.Fingerprint == fp {
 			dgState.mainWindow.state.keyVerification = false
 			return nil
 		}
 	}
-	dgState.connectWindow.state.fingerprint = fp
 	return errors.New("host key not recognized")
 }
 
@@ -81,6 +81,7 @@ func dgSFTPConfirmHostKeyVerification(onConfirm func()) error {
 }
 
 func dgSFTPDisconnect() error {
+	dgState.connectWindow.state.fingerprint = ""
 	dgSFTPClient.Close()
 	dgSSHClient.Close()
 	return nil

@@ -64,7 +64,7 @@ func uiProperties(ui *gocui.Gui, v *gocui.View) error {
 		))
 	}
 	if err != nil {
-		uiMainStatusViewMessage(0, strings.Join([]string{
+		uiMainStatusViewMessage(ui, 0, strings.Join([]string{
 			"Could not read permissions for ", selectedFile.Name(), ".",
 		}, ""))
 		return nil
@@ -128,11 +128,11 @@ func uiPropertiesHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 	permissions := dgState.propertiesWindow.state.permissions
 	validPermissions, err := regexp.MatchString("^[0-7]{3}$", propertiesPermissions)
 	if err != nil || !validPermissions {
-		uiMainStatusViewMessage(0, "Invalid file permissions.")
+		uiMainStatusViewMessage(ui, 0, "Invalid file permissions.")
 		return nil
 	}
 	if propertiesPermissions != permissions {
-		go uiMainChmodFile(propertiesPermissions, fileName)
+		go uiMainChmodFile(ui, propertiesPermissions, fileName)
 	}
 	if propertiesName != fileName {
 		go uiMainRenameFile(ui, v, propertiesName, fileName)
