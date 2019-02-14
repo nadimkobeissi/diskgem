@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -156,6 +157,27 @@ func dgFileDownload(
 
 func dgFileIsSymlink(file os.FileInfo) bool {
 	return file.Mode()&os.ModeSymlink == os.ModeSymlink
+}
+
+func dgFileFolderGetUnderlyingStructure(selectedFolder os.FileInfo, selectedFolderPath string) []string {
+	var underlyingFiles []string
+	if dgState.mainWindow.state.leftPane.focused {
+		filepath.Walk(selectedFolderPath,
+			func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				underlyingFiles = append(underlyingFiles, path)
+				return nil
+			},
+		)
+	} else if dgState.mainWindow.state.rightPane.focused {
+		walker := dgSFTPClient.Walk(selectedFolderPath)
+		for walker.Step() {
+			underlyingFiles = append(underlyingFiles, walker.Path())
+		}
+	}
+	return underlyingFiles
 }
 
 func dgFileFolderPathAutocomplete(input string, index int) (string, int) {

@@ -31,6 +31,7 @@ type panestate struct {
 	cwd            string
 	folderContents []os.FileInfo
 	lastFolder     string
+	confirmPath    string
 }
 
 type mainstate struct {
@@ -160,6 +161,7 @@ var dgStatePrototype = dgstate{
 				cwd:            "",
 				folderContents: []os.FileInfo{},
 				lastFolder:     "",
+				confirmPath:    "",
 			},
 			rightPane: panestate{
 				focused:        false,
@@ -167,6 +169,7 @@ var dgStatePrototype = dgstate{
 				cwd:            "",
 				folderContents: []os.FileInfo{},
 				lastFolder:     "",
+				confirmPath:    "",
 			},
 		},
 	},

@@ -762,34 +762,68 @@ func uiMainDeleteSelected(ui *gocui.Gui, v *gocui.View) error {
 	var err error
 	var selectedIndex *int
 	var selectedFile os.FileInfo
+	var selectedFilePath string
 	if dgState.mainWindow.state.leftPane.focused &&
 		len(dgState.mainWindow.state.leftPane.folderContents) > 0 {
 		selectedIndex = &dgState.mainWindow.state.leftPane.selectedIndex
 		selectedFile = dgState.mainWindow.state.leftPane.folderContents[*selectedIndex]
-		err = os.Remove(path.Join(
+		selectedFilePath = path.Join(
 			dgState.mainWindow.state.leftPane.cwd, selectedFile.Name(),
-		))
+		)
+		if selectedFile.IsDir() {
+			if dgState.mainWindow.state.leftPane.confirmPath != selectedFilePath {
+				dgState.mainWindow.state.leftPane.confirmPath = selectedFilePath
+				uiMainStatusViewMessage(ui, 1,
+					"You are attempting to delete a folder. Press Delete again to confirm.",
+				)
+				return nil
+			}
+			underlyingFiles := dgFileFolderGetUnderlyingStructure(selectedFile, selectedFilePath)
+			for i := len(underlyingFiles) - 1; i >= 0; i-- {
+				err = os.Remove(underlyingFiles[i])
+				if err != nil {
+					uiMainStatusViewMessage(ui, 0, strings.Join([]string{
+						"Could not delete underlying file at path ", underlyingFiles[i],
+					}, ""))
+				}
+			}
+		} else {
+			err = os.Remove(selectedFilePath)
+		}
 		go uiMainListLocalFolder(ui)
 	} else if dgState.mainWindow.state.rightPane.focused &&
 		len(dgState.mainWindow.state.rightPane.folderContents) > 0 {
 		selectedIndex = &dgState.mainWindow.state.rightPane.selectedIndex
 		selectedFile = dgState.mainWindow.state.rightPane.folderContents[*selectedIndex]
-		err = dgSFTPClient.Remove(path.Join(
+		selectedFilePath = path.Join(
 			dgState.mainWindow.state.rightPane.cwd, selectedFile.Name(),
-		))
+		)
+		if selectedFile.IsDir() {
+			if dgState.mainWindow.state.rightPane.confirmPath != selectedFilePath {
+				dgState.mainWindow.state.rightPane.confirmPath = selectedFilePath
+				uiMainStatusViewMessage(ui, 1,
+					"You are attempting to delete a folder. Press Delete again to confirm.",
+				)
+				return nil
+			}
+			underlyingFiles := dgFileFolderGetUnderlyingStructure(selectedFile, selectedFilePath)
+			for i := len(underlyingFiles) - 1; i >= 0; i-- {
+				err = dgSFTPClient.Remove(underlyingFiles[i])
+				if err != nil {
+					uiMainStatusViewMessage(ui, 0, strings.Join([]string{
+						"Could not delete underlying file at path ", underlyingFiles[i],
+					}, ""))
+				}
+			}
+		} else {
+			err = dgSFTPClient.Remove(selectedFilePath)
+		}
 		go uiMainListArchiveFolder(ui)
 	}
 	if err != nil {
-		if selectedFile.IsDir() {
-			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
-				"Could not delete ", selectedFile.Name(), ". ",
-				"Make sure the folder is empty and try again.",
-			}, ""))
-		} else {
-			uiMainStatusViewMessage(ui, 0, strings.Join([]string{
-				"Could not delete ", selectedFile.Name(), ".",
-			}, ""))
-		}
+		uiMainStatusViewMessage(ui, 0, strings.Join([]string{
+			"Could not delete ", selectedFile.Name(), ".",
+		}, ""))
 		return err
 	}
 	uiMainStatusViewMessage(ui, 2, strings.Join([]string{
