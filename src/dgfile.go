@@ -80,10 +80,10 @@ func dgFileInfoSort(files []os.FileInfo) []os.FileInfo {
 }
 
 func dgFileUpload(
-	selectedFile os.FileInfo, selectedFilePath string, archiveFilePath string,
+	selectedFilePath string, archiveFilePath string,
 	onStart func(), onProgress func(int, string), onFinish func(error),
 ) error {
-	_, err := os.Lstat(selectedFilePath)
+	selectedFile, err := os.Lstat(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
@@ -102,7 +102,7 @@ func dgFileUpload(
 	go func() {
 		ctx := context.Background()
 		progressChan := progress.NewTicker(
-			ctx, selectedFileReader, selectedFile.Size(), 500*time.Millisecond,
+			ctx, selectedFileReader, selectedFile.Size(), 100*time.Millisecond,
 		)
 		for p := range progressChan {
 			onProgress(
@@ -118,10 +118,10 @@ func dgFileUpload(
 }
 
 func dgFileDownload(
-	selectedFile os.FileInfo, selectedFilePath string, localFilePath string,
+	selectedFilePath string, localFilePath string,
 	onStart func(), onProgress func(int, string), onFinish func(error),
 ) error {
-	_, err := dgSFTPClient.Lstat(selectedFilePath)
+	selectedFile, err := dgSFTPClient.Lstat(selectedFilePath)
 	if err != nil {
 		onFinish(err)
 		return nil
@@ -140,7 +140,7 @@ func dgFileDownload(
 	go func() {
 		ctx := context.Background()
 		progressChan := progress.NewTicker(
-			ctx, localFileWriter, selectedFile.Size(), 500*time.Millisecond,
+			ctx, localFileWriter, selectedFile.Size(), 100*time.Millisecond,
 		)
 		for p := range progressChan {
 			onProgress(
@@ -159,7 +159,7 @@ func dgFileIsSymlink(file os.FileInfo) bool {
 	return file.Mode()&os.ModeSymlink == os.ModeSymlink
 }
 
-func dgFileFolderGetUnderlyingStructure(selectedFolder os.FileInfo, selectedFolderPath string) []string {
+func dgFileFolderGetUnderlyingStructure(selectedFolderPath string) []string {
 	var underlyingFiles []string
 	if dgState.mainWindow.state.leftPane.focused {
 		filepath.Walk(selectedFolderPath,

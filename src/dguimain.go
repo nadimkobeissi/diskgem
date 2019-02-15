@@ -23,7 +23,7 @@ import (
 var uiMainTransfersTicker dgticker
 
 func uiMainStartTransfersTicker(ui *gocui.Gui) error {
-	uiMainTransfersTicker.gears = time.NewTicker(500 * time.Millisecond)
+	uiMainTransfersTicker.gears = time.NewTicker(100 * time.Millisecond)
 	uiMainTransfersTicker.active = true
 	go func() {
 		for t := range uiMainTransfersTicker.gears.C {
@@ -394,7 +394,7 @@ func uiMainFileUpload(ui *gocui.Gui, v *gocui.View) error {
 		}
 	}
 	var thisTransfer dgtransfer
-	dgFileUpload(selectedFile, selectedFilePath, archiveFilePath, func() {
+	dgFileUpload(selectedFilePath, archiveFilePath, func() {
 		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 			"Uploading ", selectedFile.Name(), "...",
 		}, ""))
@@ -440,7 +440,10 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 	selectedFile := dgState.mainWindow.state.rightPane.folderContents[*selectedIndex]
 	selectedFilePath := path.Join(dgState.mainWindow.state.rightPane.cwd, selectedFile.Name())
 	localFilePath := path.Join(dgState.mainWindow.state.leftPane.cwd, selectedFile.Name())
-	if selectedFile.IsDir() || dgFileIsSymlink(selectedFile) {
+	if selectedFile.IsDir() {
+		return nil
+	}
+	if dgFileIsSymlink(selectedFile) {
 		return nil
 	}
 	for _, v := range dgState.mainWindow.state.transfers {
@@ -453,7 +456,7 @@ func uiMainFileDownload(ui *gocui.Gui, v *gocui.View) error {
 		}
 	}
 	var thisTransfer dgtransfer
-	dgFileDownload(selectedFile, selectedFilePath, localFilePath, func() {
+	dgFileDownload(selectedFilePath, localFilePath, func() {
 		uiMainStatusViewMessage(ui, 1, strings.Join([]string{
 			"Downloading ", selectedFile.Name(), "...",
 		}, ""))
@@ -778,7 +781,7 @@ func uiMainDeleteSelected(ui *gocui.Gui, v *gocui.View) error {
 				)
 				return nil
 			}
-			underlyingFiles := dgFileFolderGetUnderlyingStructure(selectedFile, selectedFilePath)
+			underlyingFiles := dgFileFolderGetUnderlyingStructure(selectedFilePath)
 			for i := len(underlyingFiles) - 1; i >= 0; i-- {
 				err = os.Remove(underlyingFiles[i])
 				if err != nil {
@@ -806,7 +809,7 @@ func uiMainDeleteSelected(ui *gocui.Gui, v *gocui.View) error {
 				)
 				return nil
 			}
-			underlyingFiles := dgFileFolderGetUnderlyingStructure(selectedFile, selectedFilePath)
+			underlyingFiles := dgFileFolderGetUnderlyingStructure(selectedFilePath)
 			for i := len(underlyingFiles) - 1; i >= 0; i-- {
 				err = dgSFTPClient.Remove(underlyingFiles[i])
 				if err != nil {

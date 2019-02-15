@@ -20,7 +20,7 @@ type dgupdate struct {
 
 func dgUpdateCheck() int {
 	var updateData dgupdate
-	var httpClient = &http.Client{Timeout: 10 * time.Second}
+	var httpClient = &http.Client{Timeout: 20 * time.Second}
 	r, err := httpClient.Get("https://diskgem.info/update.json")
 	if err != nil {
 		return 0
