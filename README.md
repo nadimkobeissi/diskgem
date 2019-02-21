@@ -9,7 +9,7 @@ DiskGem currently offers an easy to use, stable command-line user interface that
 ディスクジェムは、SFTPを介した安全なファイル転送のためのソフトウェアです。
 ディスクジェムは現在、パラレルファイル転送やその他の便利な機能をサポートする、使いやすく安定したコマンドラインユーザーインターフェイスを提供しています。 ディスクジェムは、サーバー上に暗号化されたアーカイブを作成し、メタデータの難読化だけでなく、格納されたファイルの暗号化も可能にします。
 
-<img src="https://diskgem.info/img/window.png" alt="DiskGem Window" width="400" />
+<img src="https://diskgem.info/img/window.png" alt="DiskGem Window" width="500" />
 
 ### Using DiskGem / ディスクジェムの使用
 ```sh
