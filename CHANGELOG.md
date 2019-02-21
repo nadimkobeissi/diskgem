@@ -1,3 +1,9 @@
+## DiskGem 1.4
+February 21, 2019
+
+- Add ability to delete entire folders.
+- Small improvements.
+
 ## DiskGem 1.3
 November 12, 2018
 
