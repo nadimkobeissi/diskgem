@@ -5,8 +5,6 @@
 package main
 
 import (
-	"regexp"
-
 	"github.com/jroimartin/gocui"
 )
 
@@ -43,20 +41,12 @@ func uiNewFolderToggle(ui *gocui.Gui, v *gocui.View) error {
 
 func uiNewFolderHandleEnter(ui *gocui.Gui, v *gocui.View) error {
 	newFolderName, _ := dgState.newFolderWindow.view.Line(0)
-	validFolderName, _ := regexp.MatchString(
-		"^([a-zA-Z0-9][^*/><?\"|:]*)$",
-		newFolderName,
-	)
 	if len(newFolderName) < 1 {
 		uiMainStatusViewMessage(ui, 0, "Please enter a folder name.")
 		return nil
 	}
 	if len(newFolderName) > 128 {
 		uiMainStatusViewMessage(ui, 0, "Folder name is too long.")
-		return nil
-	}
-	if !validFolderName {
-		uiMainStatusViewMessage(ui, 0, "Invalid folder name.")
 		return nil
 	}
 	uiNewFolderToggle(ui, v)
