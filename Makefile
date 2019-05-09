@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MIT
 #
-# Copyright (C) 2018 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
+# Copyright (C) 2018-2019 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
 
-PREFIX ?= /usr
+PREFIX ?= /usr/local
 
 all: deps
 	go build -ldflags="-s -w" -o dist/diskgem src/*
@@ -25,7 +25,11 @@ deps:
 install:
 	install -m0755 dist/diskgem $(PREFIX)/bin/diskgem
 	install -m0644 man/diskgem.1 $(PREFIX)/share/man/man1/diskgem.1
+ifeq ($(shell uname),Darwin)
+	/usr/libexec/makewhatis	
+else
 	mandb -q
+endif
 
 clean:
 	rm -rf dist/diskgem*

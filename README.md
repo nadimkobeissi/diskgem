@@ -31,4 +31,4 @@ sudo make install
 - **Answer:** Please forget that you ever saw this software and also that we share the same planet.
 
 ### Author / 著者
-Copyright (c) 2018 [Nadim Kobeissi](https://nadim.computer). Released under the MIT License.
+Copyright (c) 2018-2019 [Nadim Kobeissi](https://nadim.computer). Released under the MIT License.
