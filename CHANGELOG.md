@@ -1,3 +1,8 @@
+## DiskGem 1.4.1
+October 17, 2019
+
+- Now compiled with Go 1.13.2.
+
 ## DiskGem 1.4
 February 21, 2019
 
