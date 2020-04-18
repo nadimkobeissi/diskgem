@@ -26,7 +26,7 @@ type dgconfig struct {
 	KnownServers []dgknownserver
 }
 
-func dgConfigLoad() error {
+func dgConfigLoad() {
 	parsedConfig := dgconfig{
 		ServerURI:    "",
 		Username:     "",
@@ -64,6 +64,9 @@ func dgConfigLoad() error {
 	}
 	if len(configFileContents) == 0 {
 		configFileContents, err = json.Marshal(parsedConfig)
+		if err != nil {
+			dgErrorCritical(errors.New("could not write to config file"))
+		}
 		err = ioutil.WriteFile(configFilePath, configFileContents, 0600)
 		if err != nil {
 			dgErrorCritical(errors.New("could not write to config file"))
@@ -77,7 +80,6 @@ func dgConfigLoad() error {
 	dgState.connectWindow.state.serverURI = parsedConfig.ServerURI
 	dgState.connectWindow.state.username = parsedConfig.Username
 	dgState.mainWindow.state.knownServers = parsedConfig.KnownServers
-	return nil
 }
 
 func dgConfigSave() error {
@@ -95,12 +97,11 @@ func dgConfigSave() error {
 	return err
 }
 
-func dgConfigSetLastFolder(serverURI string, lastFolder string) error {
+func dgConfigSetLastFolder(serverURI string, lastFolder string) {
 	for i, server := range dgState.mainWindow.state.knownServers {
 		if server.Hostname == serverURI {
 			server.LastFolder = lastFolder
 			dgState.mainWindow.state.knownServers[i] = server
 		}
 	}
-	return nil
 }

@@ -33,6 +33,9 @@ func dgFileFindSSHPrivateKeyFiles() [][]byte {
 		var filePartialContents = make([]byte, 44)
 		filePath := path.Join(path.Join(currentUser.HomeDir, ".ssh"), file.Name())
 		fileReader, err := os.Open(filePath)
+		if err != nil {
+			continue
+		}
 		_, err = fileReader.Read(filePartialContents)
 		if err != nil {
 			continue
