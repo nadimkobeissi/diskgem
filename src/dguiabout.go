@@ -42,7 +42,7 @@ func uiAbout(ui *gocui.Gui, v *gocui.View) error {
 	fmt.Fprintln(view, strings.Join([]string{
 		"\n\n\n", aboutText, "\n  DiskGem ",
 		dgState.mainWindow.state.version,
-		"\n  https://diskgem.info",
+		"\n  https://diskgem.com",
 	}, ""))
 	ui.SetCurrentView("about")
 	return nil

@@ -97,7 +97,7 @@ func uiMainUpdateCheck(ui *gocui.Gui) error {
 	}
 	if updateStatus == 1 {
 		uiMainStatusViewMessage(ui, 1,
-			"DiskGem software update is available! Download it from https://diskgem.info.",
+			"DiskGem software update is available! Download it from https://diskgem.com.",
 		)
 	}
 	return nil

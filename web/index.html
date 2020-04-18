@@ -1,17 +1,31 @@
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="
-		initial-scale=1,
-		maximum-scale=1, minimum-scale=1,
-		width=device-width, height=device-height,
-		target-densitydpi=device-dpi" />
-	<meta name="description" content="DiskGem: command-line secure file transfer client" />
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, height=device-height, target-densitydpi=device-dpi">
+	<meta property="article:publisher" content="https://diskgem.com" />
+	<meta property="og:site_name" content="DiskGem" />
+	<meta property="og:type" content="profile" />
+	<meta property="og:locale" content="en_US" />
 	<meta name="author" content="Nadim Kobeissi">
+	<meta name="twitter:site" content="@kaepora" />
+	<meta name="twitter:creator" content="@kaepora" />
+	<meta name="twitter:card" content="summary" />
+	<meta property="og:title" content="DiskGem: command-line secure file transfer client" />
+	<meta name="twitter:text:title" content="DiskGem currently offers an easy to use, stable command-line user interface that supports parallel file transfers and other useful features.">
+	<meta property="og:description" content="DiskGem currently offers an easy to use, stable command-line user interface that supports parallel file transfers and other useful features." />
+	<meta property="og:image" content="https://diskgem.com/img/diskgem.pngg" />
+	<meta name="twitter:image" content="https://diskgem.com/img/diskgem.png" />
+	<meta name="og:image:width" content="256">
+	<meta name="og:image:height" content="256">
+	<meta property="og:url" content="https://verifpal.com" />
+	<meta name="go-import" content="verifpal.com git https://source.symbolic.software/verifpal/verifpal.git">
+	<link rel="apple-touch-icon" href="https://diskgem.com/img/diskgem.png" />
+	<link rel="image_src" href="https://diskgem.com/img/diskgem.png" />
+	<link rel="icon" type="image/png" href="https://diskgem.com/img/diskgem.png" />
 	<title>DiskGem: command-line secure file transfer client</title>
-	<link rel="icon" type="image/png" href="img/diskgem.png" />
 	<link href="https://fonts.googleapis.com/css?family=IBM+Plex+MonoIBM+Plex+Sans" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Serif" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Righteous" rel="stylesheet">
@@ -142,7 +156,6 @@
 		});
 	</script>
 </head>
-
 <body>
 	<div class="top">
 		<div class="logoContents">
@@ -156,22 +169,19 @@
 		<p class="intro">
 			DiskGem<sup class="r">&reg;</sup> is software for secure file transfer over SFTP.
 			<br /><br />
-			DiskGem currently offers an easy to use, stable command-line user interface that supports parallel file transfers
-			and other useful features. DiskGem will soon also support creating encrypted archives on the server which offer
-			encryption of stored files as well as metadata obfuscation.
+			DiskGem currently offers an easy to use, stable command-line user interface that supports parallel file transfers and other useful features. DiskGem will soon also support creating encrypted archives on the server which offer encryption of stored files as well as metadata obfuscation.
 		</p>
 	</div>
 	<div class="bot">
 		<h2>Get DiskGem</h2>
 		<p>
-			<a href="https://github.com/kaepora/diskgem/releases">Download DiskGem for Linux and macOS</a>.
+			<a href="https://gitlab.com/nadimk/diskgem/-/releases">Download DiskGem for Linux and macOS</a>.
 		</p>
 		<p class="small">
-			<em>Note:</em> DiskGem currently is not available natively on Windows due to <code>cmd.exe</code> not supporting unicode, 256-color
-			or emojis. For the best experience on Windows, it is recommended to run DiskGem under WSL using <a href="https://github.com/mintty/wsltty">WSLtty</a>.
+			<em>Note:</em> DiskGem currently works fine on Windows through the Windows Subsystem for Linux (WSL).
 		</p>
 		<div class="footer">
-			Copyright © <span id="footerYear"></span> Nadim Kobeissi. All Rights Reserved. <a href="https://github.com/kaepora/diskgem">Source Code</a>
+			Copyright © <span id="footerYear"></span> Nadim Kobeissi. All Rights Reserved. <a href="https://gitlab.com/nadimk/diskgem">Source Code</a>
 		</div>
 	</div>
 </body>
