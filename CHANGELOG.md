@@ -2,6 +2,7 @@
 April 18, 2020
 
 - Project website moved to diskgem.com.
+- Update checker changed to reflect new domain.
 
 ## DiskGem 1.4.1
 October 17, 2019
