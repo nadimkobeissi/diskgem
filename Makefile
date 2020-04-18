@@ -24,7 +24,7 @@ deps:
 
 install:
 	install -m0755 build/diskgem $(PREFIX)/bin/diskgem
-	install -m0644 assets/man/diskgem.1 $(PREFIX)/share/man/man1/diskgem.1
+	install -m0644 docs/man/diskgem.1 $(PREFIX)/share/man/man1/diskgem.1
 ifeq ($(shell uname),Darwin)
 	/usr/libexec/makewhatis	
 else
@@ -34,4 +34,4 @@ endif
 clean:
 	rm -rf build/diskgem*
 
-.PHONY: all freebsdamd64 linuxamd64 linuxarm darwinamd64 deps install clean assets build cmd
+.PHONY: all freebsdamd64 linuxamd64 linuxarm darwinamd64 deps install clean docs build cmd
