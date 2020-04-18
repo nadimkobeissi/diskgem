@@ -5,26 +5,26 @@
 PREFIX ?= /usr/local
 
 all: deps
-	go build -ldflags="-s -w" -o dist/diskgem src/*
+	go build -ldflags="-s -w" -o build/diskgem gitlab.com/nadimk/diskgem/...
 
 freebsdamd64: deps
-	GOOS="freebsd" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_freebsd_amd64 src/*
+	GOOS="freebsd" GOARCH="amd64" go build -ldflags="-s -w" -o build/diskgem_freebsd_amd64 gitlab.com/nadimk/diskgem/...
 
 linuxamd64: deps
-	GOOS="linux" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_linux_amd64 src/*
+	GOOS="linux" GOARCH="amd64" go build -ldflags="-s -w" -o build/diskgem_linux_amd64 gitlab.com/nadimk/diskgem/...
 
 linuxarm: deps
-	GOOS="linux" GOARCH="arm" go build -ldflags="-s -w" -o dist/diskgem_linux_arm src/*
+	GOOS="linux" GOARCH="arm" go build -ldflags="-s -w" -o build/diskgem_linux_arm gitlab.com/nadimk/diskgem/...
 
 darwinamd64: deps
-	GOOS="darwin" GOARCH="amd64" go build -ldflags="-s -w" -o dist/diskgem_darwin_amd64 src/*
+	GOOS="darwin" GOARCH="amd64" go build -ldflags="-s -w" -o build/diskgem_darwin_amd64 gitlab.com/nadimk/diskgem/...
 
 deps:
-	@cd src; go get -d ./...; cd ..
+	@go get -u ./...
 
 install:
-	install -m0755 dist/diskgem $(PREFIX)/bin/diskgem
-	install -m0644 man/diskgem.1 $(PREFIX)/share/man/man1/diskgem.1
+	install -m0755 build/diskgem $(PREFIX)/bin/diskgem
+	install -m0644 assets/man/diskgem.1 $(PREFIX)/share/man/man1/diskgem.1
 ifeq ($(shell uname),Darwin)
 	/usr/libexec/makewhatis	
 else
@@ -32,6 +32,6 @@ else
 endif
 
 clean:
-	rm -rf dist/diskgem*
+	rm -rf build/diskgem*
 
-.PHONY: all freebsdamd64 linuxamd64 linuxarm darwinamd64 deps install clean src man web
+.PHONY: all freebsdamd64 linuxamd64 linuxarm darwinamd64 deps install clean assets build cmd

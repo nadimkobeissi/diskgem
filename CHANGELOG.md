@@ -1,3 +1,8 @@
+## DiskGem 1.4.2
+April 18, 2020
+
+- Project website moved to diskgem.com.
+
 ## DiskGem 1.4.1
 October 17, 2019
 

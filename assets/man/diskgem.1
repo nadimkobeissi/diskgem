@@ -1,0 +1,88 @@
+.\" SPDX-License-Identifier: MIT
+.\" Copyright © 2018-2019 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
+
+.TH DISKGEM 1 "9 May 2019" "Nadim Kobeissi" "DiskGem"
+
+.SH NAME
+diskgem \- command-line secure file transfer (SFTP) client
+
+.SH SYNOPSIS
+.B diskgem
+[
+.I DIRECTORY
+]
+
+.SH DESCRIPTION
+.B DiskGem
+is software for secure file transfer over SFTP. DiskGem currently offers an easy to use, 
+stable command-line user interface that supports parallel file transfers and other useful features.
+.br
+.P
+DiskGem focuses on ease of use and on offering an enjoyable command-line interface:
+.IP \(bu
+Arrow keys are used for navigating within a folder (up/down) and between folders (left/right).
+.IP \(bu
+Alphanumeric keys, when pressed within panes, will change the current file selection to the file starting with the pressed key.
+.IP \(bu
+Tab is used for switching between the left pane (local files) and the right pane (remote archive files).
+.IP \(bu
+Enter is used for uploading or downloading files. Multiple parallel transfers are supported.
+.IP \(bu
+Delete is used for deleting files.
+.P
+Some windows offering extended features are also accessible via certain key combinations:
+.IP \(bu
+Ctrl+C \(em open the Connect view which allows connecting to servers.
+.IP \(bu
+Ctrl+G \(em shows the Go To window to switch paths more quickly. Supports tab autocompletion.
+.IP \(bu
+Ctrl+N \(em shows the New Folder creation window.
+.IP \(bu
+Ctrl+P \(em shows the Properties window, displaying file information and allowing renaming or modifying file permissions.
+.IP \(bu
+Ctrl+R \(em refreshes the current pane.
+.IP \(bu
+Ctrl+S \(em allows shell commands to be executed locally or remotely. Use with great care.
+.IP \(bu
+Ctrl+A \(em shows the About window.
+.IP \(bu
+Ctrl+D \(em disconnects from the current server.
+.IP \(bu
+Ctrl+Q \(em disconnects from the current server and quits DiskGem.
+
+
+.SH DIRECTORY
+Specifying a directory at the command line will start DiskGem at that local directory.
+
+.SH CONFIGURATION FILE FORMAT
+DiskGem creates a user configuration file located at 
+.I ~/.config/diskgem/diskgem.cfg
+with the following data:
+.P At the top level, the configuration file contains the following fields:
+.IP \(bu
+ServerURI \(em the URI of the last connected-to SFTP server.
+.IP \(bu
+Username \(em the username last used to connect to an SFTP server.
+.IP \(bu
+KnownServers \(em an array containing all known SFTP servers.
+.P
+The \fIKnownServers\fP array contains elements with the following fields:
+.IP \(bu
+Hostname \(em the hostname of the SFTP server.
+.IP \(bu
+Username \(em the username used to connect to this SFTP server.
+.IP \(bu
+Fingerprint \(em the confirmed SSH public key fingerprint for this SFTP server.
+.IP \(bu
+LastFolder \(em the last folder accessed on this SFTP server.
+
+.SH SEE ALSO
+.BR sftp (1)
+
+.SH AUTHOR
+Nadim Kobeissi
+.MT nadim@nadim.computer
+.ME .
+For more information, visit the DiskGem website at
+.UR https://\:diskgem.com/
+.UE .
