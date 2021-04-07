@@ -13,7 +13,7 @@ DiskGem currently offers an easy to use, stable command-line user interface that
 
 ### Using DiskGem / ディスクジェムの使用
 ```sh
-git clone https://gitlab.com/nadimk/diskgem.git
+git clone https://github.com/nadimkobeissi/diskgem.git
 cd diskgem
 make
 sudo make install
