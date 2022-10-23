@@ -37,7 +37,7 @@ func uiAbout(ui *gocui.Gui, v *gocui.View) error {
 		  - Arrow keys to navigate.
 		  - Tab to switch between panes.
 		  - Enter to upload/download files.
-		  - Backspace to delete files.
+		  - Delete to delete files.
 	`
 	fmt.Fprintln(view, strings.Join([]string{
 		"\n\n\n", aboutText, "\n  DiskGem ",

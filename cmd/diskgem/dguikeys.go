@@ -42,8 +42,6 @@ func uiKeysBind(ui *gocui.Gui) error {
 	ui.SetKeybinding("", gocui.KeyTab, gocui.ModNone, uiKeysTab)
 	ui.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, uiKeysEnter)
 	ui.SetKeybinding("", gocui.KeyDelete, gocui.ModNone, uiKeysDelete)
-	ui.SetKeybinding("", gocui.KeyBackspace, gocui.ModNone, uiKeysDelete)
-	ui.SetKeybinding("", gocui.KeyBackspace2, gocui.ModNone, uiKeysDelete)
 	ui.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone, uiKeysArrowUp)
 	ui.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, uiKeysArrowDown)
 	ui.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone, uiKeysArrowLeft)
