@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT
- * Copyright © 2018-2019 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
+ * Copyright © 2018-2019 Nadim Kobeissi <nadim@symbolic.software>. All Rights Reserved.
  */
 
 package main
@@ -37,7 +37,7 @@ func uiAbout(ui *gocui.Gui, v *gocui.View) error {
 		  - Arrow keys to navigate.
 		  - Tab to switch between panes.
 		  - Enter to upload/download files.
-		  - Delete to delete files.
+		  - Backspace to delete files.
 	`
 	fmt.Fprintln(view, strings.Join([]string{
 		"\n\n\n", aboutText, "\n  DiskGem ",

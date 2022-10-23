@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: MIT
 #
-# Copyright (C) 2018-2019 Nadim Kobeissi <nadim@nadim.computer>. All Rights Reserved.
+# Copyright (C) 2018-2019 Nadim Kobeissi <nadim@symbolic.software>. All Rights Reserved.
 
 PREFIX ?= /usr/local
 
 all: deps
-	@go build -ldflags="-s -w" -o build/diskgem github.com/nadimkobeissi/diskgem/...
+	@go build -ldflags="-s -w" -o build/diskgem diskgem.com/cmd/diskgem
 
 freebsdamd64: deps
 	@GOOS="freebsd" GOARCH="amd64" go build -ldflags="-s -w" -o build/diskgem_freebsd_amd64 github.com/nadimkobeissi/diskgem/...
